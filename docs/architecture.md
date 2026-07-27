@@ -32,6 +32,8 @@ Each file returns a list of lazy.nvim specs that implement one capability:
 | `ui.lua` | Statusline / notifications | `lualine.nvim`, `snacks.nvim` |
 | `session.lua` | Session management | `auto-session` |
 | `whichkey.lua` | Discoverable keymaps | `which-key.nvim` |
+| `lsp.lua` | LSP clients, diagnostics, keymaps | `nvim-lspconfig` |
+| `completion.lua` | Completion, snippets | `blink.cmp`, `LuaSnip`, `friendly-snippets` |
 
 ### `lua/languages`
 

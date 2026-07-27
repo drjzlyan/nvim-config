@@ -12,16 +12,26 @@
 
 Goals: startup < 100 ms, no unnecessary plugins.
 
-## Phase 2 — Language support
+## Phase 2 — Editing improvements (done)
 
-- [ ] Treesitter for syntax highlighting and incremental selection
-- [ ] LSP configuration via `nvim-lspconfig`
-- [ ] Completion engine (`nvim-cmp` or built-in `snacks` completion if available)
-- [ ] Per-language modules under `lua/languages/`
+- [x] Treesitter syntax / indentation / incremental selection
+- [x] Treesitter textobjects (function, class, block, parameter)
+- [x] Auto pairs (`mini.pairs`)
+- [x] Surround operations (`mini.surround`)
+- [x] Comments (`Comment.nvim`)
+- [x] TODO/FIXME/etc. highlighting and search (`todo-comments.nvim`)
 
-Initial languages: Lua, Python, Java, TypeScript/JavaScript.
+Goal: make editing excellent before adding language intelligence.
 
-## Phase 3 — Workflow integrations
+## Phase 3 — Language support (done)
+
+- [x] LSP configuration via `nvim-lspconfig`
+- [x] Completion engine (`blink.cmp`)
+- [x] Snippet engine (`LuaSnip`) and snippet collection (`friendly-snippets`)
+- [x] Externally managed language servers via Homebrew
+- [x] Per-language modules under `lua/languages/` reserved for future use
+
+## Phase 4 — Workflow integrations
 
 - [ ] Git integration (`gitsigns.nvim` / `fugitive`)
 - [ ] Debugger (`nvim-dap`)

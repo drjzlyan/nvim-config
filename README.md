@@ -20,6 +20,9 @@ nvim-config/
 │   ├── features/         # Capability modules
 │   │   ├── navigation.lua
 │   │   ├── search.lua
+│   │   ├── treesitter.lua
+│   │   ├── editing.lua
+│   │   ├── todo.lua
 │   │   ├── ui.lua
 │   │   ├── session.lua
 │   │   └── whichkey.lua
@@ -34,7 +37,7 @@ overall structure.
 
 ## Phases
 
-### Phase 1 (current)
+### Phase 1 (done)
 
 Core editing, file navigation, search, statusline, and sessions.
 
@@ -48,11 +51,40 @@ Plugins:
 - `lualine.nvim` — statusline
 - `auto-session` — session management
 
-### Phase 2
+### Phase 2 (done)
 
-Treesitter, LSP, and language-specific tooling.
+Editing improvements before adding language intelligence.
 
-### Phase 3
+Plugins:
+
+- `nvim-treesitter` + `nvim-treesitter-textobjects` — syntax, selection, text objects
+- `mini.pairs` — auto-close pairs
+- `mini.surround` — add/change/delete surrounding pairs
+- `Comment.nvim` — `gc`/`gcc` commenting
+- `todo-comments.nvim` — TODO/FIXME/etc. highlighting and search
+
+### Phase 3 (done)
+
+Language-aware editing with LSP, completion, and externally managed language
+servers.
+
+Plugins:
+
+- `neovim/nvim-lspconfig` — LSP client configuration
+- `saghen/blink.cmp` — completion engine
+- `L3MON4D3/LuaSnip` — snippet engine
+- `rafamadriz/friendly-snippets` — snippet collection
+
+Configured language servers (installed via Homebrew):
+
+- `lua_ls` — Lua
+- `jsonls` — JSON
+- `yamlls` — YAML
+- `bashls` — Bash / Zsh
+- `taplo` — TOML
+- `marksman` — Markdown
+
+### Phase 4
 
 Git integration, debugging, formatting, and advanced pickers.
 
@@ -61,11 +93,11 @@ Git integration, debugging, formatting, and advanced pickers.
 | Path | Purpose |
 |------|---------|
 | `lua/core` | Options, keymaps, autocommands, lazy bootstrap |
-| `lua/features` | One file per capability (navigation, search, ui, session, which-key) |
+| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, which-key, lsp, completion) |
 | `lua/languages` | Language-specific settings and LSP configs (future) |
 | `lua/util` | Shared helper functions |
 | `after` | Runtime overrides such as `ftplugin` |
-| `docs` | Architecture, keymaps, plugins, roadmap |
+| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp |
 
 ## Plugin philosophy
 
@@ -82,10 +114,44 @@ Git integration, debugging, formatting, and advanced pickers.
   - `<leader>f` — Files
   - `<leader>s` — Search
   - `<leader>q` — Session
-  - `<leader>l` — LSP (future)
+  - `<leader>l` — LSP
   - `<leader>d` — Debug (future)
   - `<leader>t` — Terminal (future)
 - `which-key` makes every group discoverable.
+
+## LSP architecture
+
+LSP is split into two capability files:
+
+- `lua/features/lsp.lua` — diagnostics, keymaps, server setup, and UI borders.
+- `lua/features/completion.lua` — `blink.cmp`, `LuaSnip`, and snippets.
+
+This separation keeps completion and LSP concerns independent.
+
+## Completion architecture
+
+`blink.cmp` provides completion from LSP, buffer text, paths, and snippets.
+`LuaSnip` expands snippets and `friendly-snippets` supplies the snippet
+definitions. Completion and LSP share capabilities via
+`require("blink.cmp").get_lsp_capabilities()`.
+
+## Supported language servers
+
+Language servers are intentionally **not** managed by Mason. Install them with
+Homebrew:
+
+| Server | Language | Homebrew package |
+|--------|----------|------------------|
+| `lua_ls` | Lua | `lua-language-server` |
+| `jsonls` | JSON | `vscode-json-languageserver` |
+| `yamlls` | YAML | `yaml-language-server` |
+| `bashls` | Bash / Zsh | `bash-language-server` |
+| `taplo` | TOML | `taplo` |
+| `marksman` | Markdown | `marksman` |
+
+```bash
+brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman
+```
 
 ## Installation
 
@@ -112,4 +178,6 @@ The `lazy-lock.json` is committed for reproducibility.
 - [`docs/installation.md`](docs/installation.md)
 - [`docs/plugins.md`](docs/plugins.md)
 - [`docs/keymaps.md`](docs/keymaps.md)
+- [`docs/treesitter.md`](docs/treesitter.md)
+- [`docs/editing.md`](docs/editing.md)
 - [`docs/roadmap.md`](docs/roadmap.md)

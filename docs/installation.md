@@ -3,7 +3,7 @@
 ## Requirements
 
 - macOS
-- Neovim >= 0.10
+- Neovim >= 0.11
 - Git
 - A Nerd Font (installed by the `dotfiles` repo)
 
@@ -31,6 +31,20 @@ cd dotfiles
 ```
 
 This installs the required tools and fonts.
+
+## Language servers
+
+Phase 3 uses `nvim-lspconfig` with language servers managed externally by
+Homebrew. Mason is intentionally not used.
+
+Install the supported servers:
+
+```bash
+brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman
+```
+
+Verify each binary is on your `$PATH` before opening the corresponding
+filetype.
 
 ## Verify startup time
 

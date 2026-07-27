@@ -77,10 +77,18 @@ See `docs/plugins.md` and `docs/keymaps.md` for details.
 
 See `docs/plugins.md` and `docs/keymaps.md` for details.
 
-## Phase 8 — Workflow integrations
+## Phase 8 — Terminal-first workflow (done)
 
-- [ ] Formatting and linting for other languages (`nvim-lint`)
-- [ ] Additional pickers and advanced `snacks.nvim` modules as needed
+- [x] `akinsho/toggleterm.nvim` for persistent, reusable terminals
+- [x] Horizontal, vertical, and floating terminal layouts
+- [x] Dedicated terminals: Shell, Build, Test, Git, Agent
+- [x] Generic task commands (build, test, run current file, run project, clean)
+- [x] Language-agnostic task providers with Python and Java adapters
+- [x] Project detection via `pyproject.toml`, `pom.xml`, `build.gradle`, and `settings.gradle`
+- [x] Terminal and task keymaps under `<leader>t`
+- [x] `which-key` registration for terminal and task commands
+
+See [`docs/terminal.md`](docs/terminal.md) and [`docs/tasks.md`](docs/tasks.md) for details.
 
 ## Non-goals
 

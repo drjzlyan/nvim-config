@@ -199,4 +199,22 @@ Press `<leader>` and pause to see groups via `which-key.nvim`.
 Reserved groups for later phases:
 
 - `<leader>d` — Debug
-- `<leader>t` — Terminal
+
+## Terminal / Tasks
+
+The `<leader>t` menu groups terminal and generic task commands.
+
+| Key | Action |
+|-----|--------|
+| `<leader>tt` | Toggle terminal (horizontal) |
+| `<leader>tf` | Toggle floating terminal |
+| `<leader>ta` | Toggle Agent terminal (floating) |
+| `<leader>tg` | Toggle Git terminal (vertical) |
+| `<leader>tb` | Run build for the current project |
+| `<leader>tr` | Run the current file |
+| `<leader>ts` | Run tests for the current project |
+| `<leader>tp` | Run the current project |
+| `<leader>tc` | Clean build artifacts |
+
+Build, test, and clean are dispatched through the task provider detected for
+the buffer. Python and Java adapters are registered automatically.

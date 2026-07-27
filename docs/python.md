@@ -152,6 +152,23 @@ ignored for file navigation are added to `wildignore`:
 `basedpyright` is configured with `diagnosticMode = "openFilesOnly"` so it only
 analyzes files you actually open.
 
+## Task provider
+
+Python is also registered as a generic task provider in `lua/languages/python.lua`.
+When the current buffer is in a Python project, the `<leader>t` task keymaps
+dispatch to this provider:
+
+| Task | Command |
+|------|---------|
+| Build | not supported |
+| Test | `uv run python -m pytest` or detected venv/python3 `pytest` |
+| Run current file | `uv run python <file>` or detected interpreter |
+| Run project | `uv run python -m <module>` if inside the project tree |
+| Clean | remove all `__pycache__` directories under the project root |
+
+See [`docs/tasks.md`](docs/tasks.md) for the provider API and how to add new
+adapters.
+
 ## What is intentionally not included
 
 Following the Phase 4 brief:

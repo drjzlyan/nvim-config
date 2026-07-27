@@ -124,6 +124,23 @@ Maven or Gradle commands, respectively.
 | `<leader>jm` | n | Run Maven |
 | `<leader>jg` | n | Run Gradle |
 
+## Task provider
+
+Java is also registered as a generic task provider in `lua/languages/java.lua`.
+When the current buffer is in a Maven or Gradle project, the `<leader>t` task
+keymaps dispatch to this provider:
+
+| Task | Maven command | Gradle command |
+|------|---------------|----------------|
+| Build | `mvn package` | `gradle build` |
+| Test | `mvn test` | `gradle test` |
+| Run current file | not supported | not supported |
+| Run project | `mvn` | `gradle` |
+| Clean | `mvn clean` | `gradle clean` |
+
+See [`docs/tasks.md`](docs/tasks.md) for the provider API and how to add new
+adapters.
+
 ## Performance
 
 - `jdtls` is only attached in Java buffers.

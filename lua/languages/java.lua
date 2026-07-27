@@ -224,10 +224,14 @@ end
 -- Placeholder project commands
 -- ============================================================================
 
-local function run_in_terminal(cmd, cwd)
+local function send_to_terminal(cmd, cwd, name)
+  name = name or "shell"
   cwd = cwd or vim.fn.getcwd()
-  vim.cmd("split")
-  vim.fn.termopen(cmd, { cwd = cwd })
+  local terminal = require("features.terminal")
+  if type(cmd) == "table" then
+    cmd = table.concat(cmd, " ")
+  end
+  terminal.send(name, cmd, { dir = cwd })
 end
 
 local function compile_project()
@@ -244,7 +248,7 @@ local function compile_project()
     vim.notify("No Maven or Gradle project found", vim.log.levels.WARN)
     return
   end
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "build")
 end
 
 local function run_maven()
@@ -253,7 +257,7 @@ local function run_maven()
     vim.notify("No pom.xml found", vim.log.levels.WARN)
     return
   end
-  run_in_terminal({ "mvn" }, root)
+  send_to_terminal({ "mvn" }, root, "build")
 end
 
 local function run_gradle()
@@ -265,7 +269,7 @@ local function run_gradle()
     vim.notify("No Gradle project found", vim.log.levels.WARN)
     return
   end
-  run_in_terminal({ "gradle" }, root)
+  send_to_terminal({ "gradle" }, root, "build")
 end
 
 -- ============================================================================
@@ -389,6 +393,76 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- ============================================================================
 
 vim.opt.wildignore:append("*/target/*,*/build/*,*/.gradle/*,*/.idea/*")
+
+-- ============================================================================
+-- Generic task provider
+-- ============================================================================
+
+local function is_maven(root)
+  return vim.fn.filereadable(root .. "/pom.xml") == 1
+end
+
+local function is_gradle(root)
+  return vim.fn.filereadable(root .. "/build.gradle") == 1
+    or vim.fn.filereadable(root .. "/settings.gradle") == 1
+    or vim.fn.filereadable(root .. "/settings.gradle.kts") == 1
+end
+
+local java_provider = {
+  detect = function(bufnr)
+    local root = project_root(bufnr)
+    return is_maven(root) or is_gradle(root)
+  end,
+
+  build = function(bufnr)
+    local root = project_root(bufnr)
+    if is_maven(root) then
+      return { cmd = { "mvn", "package" }, cwd = root }
+    elseif is_gradle(root) then
+      return { cmd = { "gradle", "build" }, cwd = root }
+    end
+    return nil
+  end,
+
+  test = function(bufnr)
+    local root = project_root(bufnr)
+    if is_maven(root) then
+      return { cmd = { "mvn", "test" }, cwd = root }
+    elseif is_gradle(root) then
+      return { cmd = { "gradle", "test" }, cwd = root }
+    end
+    return nil
+  end,
+
+  run_file = function()
+    return nil
+  end,
+
+  run_project = function(bufnr)
+    local root = project_root(bufnr)
+    if is_maven(root) then
+      return { cmd = { "mvn" }, cwd = root }
+    elseif is_gradle(root) then
+      return { cmd = { "gradle" }, cwd = root }
+    end
+    return nil
+  end,
+
+  clean = function(bufnr)
+    local root = project_root(bufnr)
+    if is_maven(root) then
+      return { cmd = { "mvn", "clean" }, cwd = root }
+    elseif is_gradle(root) then
+      return { cmd = { "gradle", "clean" }, cwd = root }
+    end
+    return nil
+  end,
+}
+
+local ok, tasks = pcall(require, "features.tasks")
+if ok then
+  tasks.register("java", java_provider)
+end
 
 -- This module is loaded by lazy.nvim's `import = "languages"` mechanism.
 return {}

@@ -80,10 +80,14 @@ end
 -- Terminal runner
 -- ============================================================================
 
-local function run_in_terminal(cmd, cwd)
+local function send_to_terminal(cmd, cwd, name)
+  name = name or "shell"
   cwd = cwd or vim.fn.getcwd()
-  vim.cmd("split")
-  vim.fn.termopen(cmd, { cwd = cwd })
+  local terminal = require("features.terminal")
+  if type(cmd) == "table" then
+    cmd = table.concat(cmd, " ")
+  end
+  terminal.send(name, cmd, { dir = cwd })
 end
 
 -- ============================================================================
@@ -134,7 +138,7 @@ local function run_file()
   local root = project_root(bufnr)
   local cmd = python_cmd(bufnr)
   table.insert(cmd, file)
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "shell")
 end
 
 local function relpath(path, base)
@@ -159,7 +163,7 @@ local function run_module()
   local cmd = python_cmd(bufnr)
   table.insert(cmd, "-m")
   table.insert(cmd, module)
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "shell")
 end
 
 local function run_selection()
@@ -186,7 +190,7 @@ local function run_selection()
   local root = project_root(bufnr)
   local cmd = python_cmd(bufnr)
   table.insert(cmd, tmp)
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "shell")
 end
 
 -- ============================================================================
@@ -203,7 +207,7 @@ local function pytest_file()
   local root = project_root(bufnr)
   local cmd = python_cmd(bufnr)
   vim.list_extend(cmd, { "-m", "pytest", file })
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "test")
 end
 
 local function pytest_function()
@@ -223,7 +227,7 @@ local function pytest_function()
   local root = project_root(bufnr)
   local cmd = python_cmd(bufnr)
   vim.list_extend(cmd, { "-m", "pytest", target })
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "test")
 end
 
 local function pytest_project()
@@ -231,7 +235,7 @@ local function pytest_project()
   local root = project_root(bufnr)
   local cmd = python_cmd(bufnr)
   vim.list_extend(cmd, { "-m", "pytest" })
-  run_in_terminal(cmd, root)
+  send_to_terminal(cmd, root, "test")
 end
 
 -- ============================================================================
@@ -411,6 +415,80 @@ vim.api.nvim_create_autocmd("BufWritePre", {
 -- ============================================================================
 
 vim.opt.wildignore:append("*/.venv/*,*/__pycache__/*,*/.pytest_cache/*,*/.mypy_cache/*")
+
+-- ============================================================================
+-- Generic task provider
+-- ============================================================================
+
+local python_provider = {
+  detect = function(bufnr)
+    local root = project_root(bufnr)
+    local markers = {
+      "pyproject.toml",
+      "setup.py",
+      "setup.cfg",
+      "requirements.txt",
+      "Pipfile",
+    }
+    for _, marker in ipairs(markers) do
+      if vim.fn.filereadable(root .. "/" .. marker) == 1 then
+        return true
+      end
+    end
+    return false
+  end,
+
+  build = function()
+    return nil
+  end,
+
+  test = function(bufnr)
+    local root = project_root(bufnr)
+    local cmd = python_cmd(bufnr)
+    vim.list_extend(cmd, { "-m", "pytest" })
+    return { cmd = cmd, cwd = root }
+  end,
+
+  run_file = function(bufnr)
+    local file = vim.api.nvim_buf_get_name(bufnr)
+    if file == "" then
+      return nil
+    end
+    local root = project_root(bufnr)
+    local cmd = python_cmd(bufnr)
+    table.insert(cmd, file)
+    return { cmd = cmd, cwd = root }
+  end,
+
+  run_project = function(bufnr)
+    local file = vim.api.nvim_buf_get_name(bufnr)
+    local root = project_root(bufnr)
+    if file ~= "" then
+      local rel = relpath(file, root)
+      if rel ~= file then
+        local module = rel:gsub("%.py$", ""):gsub("[/\\]", ".")
+        local cmd = python_cmd(bufnr)
+        table.insert(cmd, "-m")
+        table.insert(cmd, module)
+        return { cmd = cmd, cwd = root }
+      end
+    end
+    return { cmd = python_cmd(bufnr), cwd = root }
+  end,
+
+  clean = function(bufnr)
+    local root = project_root(bufnr)
+    return {
+      cmd = { "find", root, "-type", "d", "-name", "__pycache__", "-exec", "rm", "-rf", "{}", "+" },
+      cwd = root,
+    }
+  end,
+}
+
+local ok, tasks = pcall(require, "features.tasks")
+if ok then
+  tasks.register("python", python_provider)
+end
 
 -- This module is loaded by lazy.nvim's `import = "languages"` mechanism.
 -- It does not need to return a plugin spec, but returning an empty table keeps

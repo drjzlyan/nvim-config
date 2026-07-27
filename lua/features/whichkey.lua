@@ -17,8 +17,19 @@ return {
         { "<leader>l", group = "LSP" },
         { "<leader>p", group = "Python" },
         { "<leader>j", group = "Java" },
-        { "<leader>t", group = "Terminal" },
+        { "<leader>t", group = "Terminal / Tasks" },
         { "<leader>q", group = "Session" },
+        -- Terminal (see lua/features/terminal.lua)
+        { "<leader>tt", desc = "Toggle terminal" },
+        { "<leader>tf", desc = "Floating terminal" },
+        { "<leader>ta", desc = "Agent terminal" },
+        { "<leader>tg", desc = "Git terminal" },
+        -- Tasks (see lua/features/tasks.lua)
+        { "<leader>tb", desc = "Run build" },
+        { "<leader>tr", desc = "Run current file" },
+        { "<leader>ts", desc = "Run tests" },
+        { "<leader>tp", desc = "Run project" },
+        { "<leader>tc", desc = "Clean" },
         -- Git (see lua/features/git.lua)
         { "<leader>gg", desc = "LazyGit" },
         { "<leader>gd", desc = "Diffview" },

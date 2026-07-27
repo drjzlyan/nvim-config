@@ -181,16 +181,42 @@ Key highlights:
 
 See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
 
+### Phase 8 (done)
+
+Terminal-first workflow for build, test, run, and Git operations.
+
+Plugins:
+
+- `akinsho/toggleterm.nvim` — persistent, reusable terminals
+
+External tools (managed outside Neovim):
+
+- `git`
+- `maven`, `gradle` (Java)
+- `uv`, `pytest` (Python)
+
+Key highlights:
+
+- `<leader>t` menu combines terminal and task commands
+- `<leader>tt` / `<leader>tf` toggle horizontal and floating terminals
+- `<leader>ta`, `<leader>tg` toggle dedicated Agent and Git terminals
+- `<leader>tb`, `<leader>tr`, `<leader>ts`, `<leader>tc` run generic build, run, test, and clean tasks
+- Named terminals (Shell, Build, Test, Git, Agent) are reused, never duplicated
+- Generic task providers are language-agnostic; Python and Java adapters register automatically
+- Project detection via `pyproject.toml`, `pom.xml`, `build.gradle`, and `settings.gradle`
+
+See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
+
 ## Directory layout
 
 | Path | Purpose |
 |------|---------|
 | `lua/core` | Options, keymaps, autocommands, lazy bootstrap |
-| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, debugger, which-key, lsp, completion) |
+| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, debugger, terminal, tasks, which-key, lsp, completion) |
 | `lua/languages` | Language-specific settings, LSP configs, and debug adapters (`python.lua`, `java.lua`, etc.) |
 | `lua/util` | Shared helper functions |
 | `after` | Runtime overrides such as `ftplugin` |
-| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python, java, debugging |
+| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python, java, debugging, terminal, tasks |
 
 ## Plugin philosophy
 
@@ -212,7 +238,7 @@ See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full wor
   - `<leader>p` — Python
   - `<leader>j` — Java
   - `<leader>d` — Debug
-  - `<leader>t` — Terminal (future)
+  - `<leader>t` — Terminal / Tasks
 - `which-key` makes every group discoverable.
 
 ## LSP architecture
@@ -281,4 +307,6 @@ The `lazy-lock.json` is committed for reproducibility.
 - [`docs/python.md`](docs/python.md)
 - [`docs/java.md`](docs/java.md)
 - [`docs/debugging.md`](docs/debugging.md)
+- [`docs/terminal.md`](docs/terminal.md)
+- [`docs/tasks.md`](docs/tasks.md)
 - [`docs/roadmap.md`](docs/roadmap.md)

@@ -79,9 +79,13 @@ end
 
 function M.clear_workspace_cache()
   local dir = java_util.workspace_dir(project.root(0))
-  vim.fn.delete(dir, "rf")
+  local ok, err = pcall(vim.fn.delete, dir, "rf")
+  if not ok then
+    vim.notify("Failed to clear jdtls workspace cache: " .. tostring(err), vim.log.levels.ERROR)
+    return
+  end
   vim.notify("Cleared jdtls workspace cache: " .. dir, vim.log.levels.INFO)
-  vim.cmd("LspRestart jdtls")
+  pcall(vim.cmd, "LspRestart jdtls")
 end
 
 function M.build_workspace()

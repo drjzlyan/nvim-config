@@ -18,6 +18,7 @@ Configures Neovim itself:
 - `options.lua` — `vim.opt` and `vim.g` settings.
 - `keymaps.lua` — non-plugin keymaps.
 - `autocmds.lua` — autocommands.
+- `commands.lua` — custom commands (`:DevHealth`, `:DevInfo`, etc.).
 - `lazy.lua` — bootstraps `lazy.nvim` and loads specs from `features` and
   `languages`.
 
@@ -34,8 +35,8 @@ Each file returns a list of lazy.nvim specs that implement one capability:
 | `git.lua` | Git workflow | `gitsigns.nvim`, `diffview.nvim` |
 | `debugger.lua` | Debugging UI and keymaps | `nvim-dap`, `nvim-dap-ui`, `nvim-dap-virtual-text` |
 | `whichkey.lua` | Discoverable keymaps | `which-key.nvim` |
-| `lsp.lua` | LSP clients, diagnostics, keymaps | `nvim-lspconfig` |
-| `completion.lua` | Completion, snippets | `blink.cmp`, `LuaSnip`, `friendly-snippets` |
+| `lsp.lua` | LSP clients, diagnostics, keymaps | `nvim-lspconfig` (via `vim.lsp.config`) |
+| `completion.lua` | Completion, snippets | `blink.cmp`, `blink.lib`, `LuaSnip`, `friendly-snippets` |
 | `java.lua` | Java formatting | `conform.nvim` |
 
 ### `lua/languages`
@@ -52,6 +53,21 @@ Reserved for language-specific configuration and LSP servers.
 ### `lua/util`
 
 Shared helper functions used by multiple modules.
+
+| File | Purpose |
+|------|---------|
+| `helpers.lua` | Generic helpers (`has`, `dump`). |
+| `project.lua` | Project root and type detection. |
+| `java.lua` | JDK resolution, Lombok discovery, JDTLS command builder. |
+| `health.lua` | Environment health checks used by `:DevHealth`. |
+
+### `lua/dev`
+
+Neovim `:checkhealth` integration.
+
+| File | Purpose |
+|------|---------|
+| `health.lua` | Standard `:checkhealth dev` report. |
 
 ### `after/`
 

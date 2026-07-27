@@ -249,3 +249,16 @@ The `<leader>t` menu groups terminal and generic task commands.
 
 Build, test, and clean are dispatched through the task provider detected for
 the buffer. Python and Java adapters are registered automatically.
+
+## Developer commands
+
+These commands are not bound to keys by default.
+
+| Command | Action |
+|---------|--------|
+| `:DevHealth` | Show environment health report |
+| `:DevInfo` | Show project detection info for the current buffer |
+| `:DevReload` | Reload configuration modules |
+| `:DevUpdate` | Update plugins and external tooling |
+| `:DevProfile` | Profile Neovim startup |
+| `:DevCleanCache` | Clear Treesitter, JDTLS, swap, session, or Lazy caches |

@@ -52,8 +52,8 @@ function M.pick_jdk_for_project(root)
   if not root then
     return M.resolve_jdk()
   end
-  local f = io.open(root .. "/.java-version", "r")
-  if f then
+  local ok, f = pcall(io.open, root .. "/.java-version", "r")
+  if ok and f then
     local wanted = tonumber((f:read("*l") or ""):match("(%d+)"))
     f:close()
     if wanted then

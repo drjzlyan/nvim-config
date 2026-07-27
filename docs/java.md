@@ -9,8 +9,8 @@ Java support is split across several files to keep concerns separate:
 
 - `lua/features/java.lua` — plugin configuration for `conform.nvim`, which runs
   `google-java-format`.
-- `lua/languages/java.lua` — `jdtls` setup, autocommands, and provider
-  registrations.
+- `lua/languages/java.lua` — `jdtls` start configuration, autocommands, and
+  provider registrations.
 - `lua/languages/java-commands.lua` — buffer-local commands and keymaps for
   imports, refactoring, call hierarchy, and workspace management.
 - `lua/languages/java-project.lua` — Maven and Gradle project command helpers.
@@ -119,7 +119,9 @@ the build system:
 
 ## LSP features
 
-`jdtls` is started only when a Java file is opened. It provides:
+`jdtls` is started only when a Java file is opened, using
+`require("jdtls").start_or_attach(config)` so the command and workspace are
+calculated per project root. It provides:
 
 - Go to definition
 - Find references

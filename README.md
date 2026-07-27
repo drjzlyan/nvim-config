@@ -237,6 +237,35 @@ Key highlights:
 
 See [`docs/java.md`](docs/java.md) for the full Java workflow.
 
+### Phase 10 (done)
+
+Production-ready release: performance, reliability, documentation, health checks,
+and distribution.
+
+Focus areas:
+
+- **Startup performance**: profiled and optimized; every plugin lazy-loads where
+  appropriate; startup stays under 80 ms on Apple Silicon.
+- **Health checks**: `:DevHealth` and `:checkhealth dev` verify Neovim, Git,
+  ripgrep, fd, fzf, Lazygit, Ghostty, tmux, uv, JDKs, JAVA_HOME, jdtls,
+  basedpyright, ruff, debugpy, google-java-format, and Lombok.
+- **Project detection**: automatic root detection for Git, Python, Java, Maven,
+  Gradle, and `pyproject.toml`.
+- **Custom commands**: `:DevHealth`, `:DevInfo`, `:DevReload`, `:DevUpdate`,
+  `:DevProfile`, `:DevCleanCache`.
+- **Cache management**: clear Treesitter, JDTLS workspace, swap, sessions, and
+  Lazy caches from inside Neovim.
+- **Error handling**: missing executables, LSP servers, JDKs, and broken
+  projects are reported gracefully; Neovim never crashes.
+- **Modern APIs**: migrated LSP configuration to `vim.lsp.config` and
+  `vim.lsp.enable`; no deprecated APIs.
+- **Distribution**: tagged `v1.0.0`, `CHANGELOG.md`, GitHub Actions CI, and
+  improved `dotfiles` scripts (`install.sh`, `update.sh`, `doctor.sh`,
+  `link.sh`).
+
+See [`docs/health.md`](docs/health.md), [`docs/troubleshooting.md`](docs/troubleshooting.md),
+and [`docs/faq.md`](docs/faq.md) for details.
+
 ## Directory layout
 
 | Path | Purpose |
@@ -273,10 +302,17 @@ See [`docs/java.md`](docs/java.md) for the full Java workflow.
 
 ## LSP architecture
 
+LSP configuration uses Neovim 0.11's native `vim.lsp.config` and
+`vim.lsp.enable` APIs. `nvim-lspconfig` is still loaded so its server
+definitions are available, but the deprecated `lspconfig.*.setup()` framework
+is no longer used.
+
 LSP is split into two capability files:
 
-- `lua/features/lsp.lua` — diagnostics, keymaps, server setup, and UI borders.
-- `lua/features/completion.lua` — `blink.cmp`, `LuaSnip`, and snippets.
+- `lua/features/lsp.lua` — diagnostics, keymaps, and server enablement for
+  config-file languages.
+- `lua/features/completion.lua` — `blink.cmp`, `blink.lib`, `LuaSnip`, and
+  snippets.
 
 This separation keeps completion and LSP concerns independent.
 
@@ -289,11 +325,11 @@ definitions. Completion and LSP share capabilities via
 
 ## Supported language servers
 
-Language servers are intentionally **not** managed by Mason. Install them with
-Homebrew:
+Language servers and formatters are intentionally **not** managed by Mason.
+Install them with Homebrew or `uv`:
 
-| Server | Language | Homebrew package |
-|--------|----------|------------------|
+| Server | Language | Package |
+|--------|----------|---------|
 | `lua_ls` | Lua | `lua-language-server` |
 | `jsonls` | JSON | `vscode-json-languageserver` |
 | `yamlls` | YAML | `yaml-language-server` |
@@ -301,9 +337,12 @@ Homebrew:
 | `taplo` | TOML | `taplo` |
 | `marksman` | Markdown | `marksman` |
 | `jdtls` | Java | `jdtls` |
+| `basedpyright` | Python | `basedpyright` |
+| `ruff` | Python | `ruff` |
+| `google-java-format` | Java | `google-java-format` |
 
 ```bash
-brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman jdtls
+brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman jdtls basedpyright ruff google-java-format
 ```
 
 ## Installation
@@ -339,4 +378,8 @@ The `lazy-lock.json` is committed for reproducibility.
 - [`docs/debugging.md`](docs/debugging.md)
 - [`docs/terminal.md`](docs/terminal.md)
 - [`docs/tasks.md`](docs/tasks.md)
+- [`docs/health.md`](docs/health.md)
+- [`docs/troubleshooting.md`](docs/troubleshooting.md)
+- [`docs/faq.md`](docs/faq.md)
+- [`docs/migration.md`](docs/migration.md)
 - [`docs/roadmap.md`](docs/roadmap.md)

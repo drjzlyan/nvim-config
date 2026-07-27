@@ -93,10 +93,10 @@ return {
       local dap = require("dap")
       local dapui = require("dapui")
 
-      vim.fn.sign_define("DapBreakpoint", { text = "B", texthl = "DapBreakpoint", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapBreakpointCondition", { text = "C", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapLogPoint", { text = "L", texthl = "DapLogPoint", linehl = "", numhl = "" })
-      vim.fn.sign_define("DapStopped", { text = "→", texthl = "DapStopped", linehl = "DapStopped", numhl = "" })
+      vim.fn.sign_define("DapBreakpoint", { text = "B", texthl = "DapBreakpoint" })
+      vim.fn.sign_define("DapBreakpointCondition", { text = "C", texthl = "DapBreakpointCondition" })
+      vim.fn.sign_define("DapLogPoint", { text = "L", texthl = "DapLogPoint" })
+      vim.fn.sign_define("DapStopped", { text = "→", texthl = "DapStopped", linehl = "DapStopped" })
 
       dapui.setup()
 
@@ -123,10 +123,14 @@ return {
 
       local function setup_adapters()
         local ft = vim.bo.filetype
+        local ok, adapter
         if ft == "python" then
-          require("languages.python-debug").setup()
+          ok, adapter = pcall(require, "languages.python-debug")
         elseif ft == "java" then
-          require("languages.java-debug").setup()
+          ok, adapter = pcall(require, "languages.java-debug")
+        end
+        if ok and adapter and adapter.setup then
+          adapter.setup()
         end
       end
 
@@ -137,14 +141,20 @@ return {
         group = augroup,
         pattern = "python",
         callback = function()
-          require("languages.python-debug").setup()
+          local ok, adapter = pcall(require, "languages.python-debug")
+          if ok and adapter and adapter.setup then
+            adapter.setup()
+          end
         end,
       })
       vim.api.nvim_create_autocmd("FileType", {
         group = augroup,
         pattern = "java",
         callback = function()
-          require("languages.java-debug").setup()
+          local ok, adapter = pcall(require, "languages.java-debug")
+          if ok and adapter and adapter.setup then
+            adapter.setup()
+          end
         end,
       })
     end,

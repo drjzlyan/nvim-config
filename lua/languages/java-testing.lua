@@ -40,11 +40,21 @@ function M.detect(bufnr)
 end
 
 function M.run_nearest(_bufnr)
-  require("jdtls").test_nearest_method({ config_overrides = { noDebug = true } })
+  local ok, jdtls = pcall(require, "jdtls")
+  if not ok then
+    vim.notify("nvim-jdtls is not available", vim.log.levels.ERROR)
+    return
+  end
+  jdtls.test_nearest_method({ config_overrides = { noDebug = true } })
 end
 
 function M.run_current_class(_bufnr)
-  require("jdtls").test_class({ config_overrides = { noDebug = true } })
+  local ok, jdtls = pcall(require, "jdtls")
+  if not ok then
+    vim.notify("nvim-jdtls is not available", vim.log.levels.ERROR)
+    return
+  end
+  jdtls.test_class({ config_overrides = { noDebug = true } })
 end
 
 function M.run_package(bufnr)
@@ -77,11 +87,21 @@ function M.run_module(bufnr)
 end
 
 function M.debug_nearest(_bufnr)
-  require("jdtls").test_nearest_method()
+  local ok, jdtls = pcall(require, "jdtls")
+  if not ok then
+    vim.notify("nvim-jdtls is not available", vim.log.levels.ERROR)
+    return
+  end
+  jdtls.test_nearest_method()
 end
 
 function M.debug_current_class(_bufnr)
-  require("jdtls").test_class()
+  local ok, jdtls = pcall(require, "jdtls")
+  if not ok then
+    vim.notify("nvim-jdtls is not available", vim.log.levels.ERROR)
+    return
+  end
+  jdtls.test_class()
 end
 
 return M

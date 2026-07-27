@@ -182,11 +182,13 @@ local function run_selection()
   end
   local text = table.concat(lines, "\n") .. "\n"
   local tmp = vim.fn.tempname() .. ".py"
-  local f = io.open(tmp, "w")
-  if f then
-    f:write(text)
-    f:close()
+  local f, write_err = io.open(tmp, "w")
+  if not f then
+    vim.notify("Failed to write temporary Python file: " .. tostring(write_err), vim.log.levels.ERROR)
+    return
   end
+  f:write(text)
+  f:close()
   local root = project_root(bufnr)
   local cmd = python_cmd(bufnr)
   table.insert(cmd, tmp)
@@ -335,54 +337,72 @@ end
 -- ============================================================================
 
 local function setup_lsp()
+  -- Ensure nvim-lspconfig server definitions are registered before
+  -- vim.lsp.config is used; requiring the plugin directly does not trigger the
+  -- deprecated setup framework.
   local lspconfig = require("lspconfig")
+  _ = lspconfig
+
+  local has_basedpyright = vim.fn.executable("basedpyright") == 1
+  local has_ruff = vim.fn.executable("ruff") == 1
+  if not has_basedpyright and not has_ruff then
+    vim.notify("Python LSP servers not found. Install with: brew install basedpyright ruff", vim.log.levels.WARN)
+    return
+  end
+
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   local ok, blink = pcall(require, "blink.cmp")
   if ok then
-    capabilities = blink.get_lsp_capabilities()
+    capabilities = blink.get_lsp_capabilities(capabilities)
   end
 
   -- basedpyright: type checking, navigation, hover, workspace symbols, etc.
-  lspconfig.basedpyright.setup({
-    capabilities = capabilities,
-    on_new_config = function(new_config, new_root_dir)
-      local python = find_venv_python(new_root_dir)
-      if python then
-        new_config.settings = vim.tbl_deep_extend(
-          "force",
-          new_config.settings or {},
-          { python = { pythonPath = python } }
-        )
-      end
-    end,
-    settings = {
-      python = {
-        pythonPath = python_interpreter(0),
-      },
-      basedpyright = {
-        analysis = {
-          autoSearchPaths = true,
-          diagnosticMode = "openFilesOnly",
-          typeCheckingMode = "standard",
+  -- The virtual-env python path is set per-client after attach so each project
+  -- uses its own environment.
+  if has_basedpyright then
+    vim.lsp.config("basedpyright", {
+      capabilities = capabilities,
+      filetypes = { "python" },
+      settings = {
+        basedpyright = {
+          analysis = {
+            autoSearchPaths = true,
+            diagnosticMode = "openFilesOnly",
+            typeCheckingMode = "standard",
+          },
+          disableTaggedHints = true,
         },
-        disableTaggedHints = true,
       },
-    },
-  })
+      on_attach = function(client, bufnr)
+        local python = find_venv_python(project_root(bufnr))
+        if python then
+          local settings = vim.tbl_deep_extend("force", client.config.settings or {}, {
+            python = { pythonPath = python },
+          })
+          client:notify("workspace/didChangeConfiguration", { settings = settings })
+        end
+      end,
+    })
+    vim.lsp.enable("basedpyright")
+  end
 
   -- Ruff: linting, formatting, organize imports, code actions.
   -- Ruff is preferred over basedpyright whenever there is overlap.
-  lspconfig.ruff.setup({
-    capabilities = capabilities,
-    init_options = {
-      settings = {
-        organizeImports = true,
-        fixAll = true,
-        lint = { enable = true },
-        format = { backend = "internal" },
+  if has_ruff then
+    vim.lsp.config("ruff", {
+      capabilities = capabilities,
+      filetypes = { "python" },
+      init_options = {
+        settings = {
+          organizeImports = true,
+          fixAll = true,
+          lint = { enable = true },
+          format = { backend = "internal" },
+        },
       },
-    },
-  })
+    })
+    vim.lsp.enable("ruff")
+  end
 end
 
 -- ============================================================================

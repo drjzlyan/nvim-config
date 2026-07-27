@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stylua
+        uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check .
+
+      - name: Install luacheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luacheck
+
+      - name: Run luacheck
+        run: luacheck lua --globals vim --max-line-length 120
+
+  startup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhymond/setup-neovim@v1
+        with:
+          neovim-version: stable
+
+      - name: Bootstrap lazy.nvim plugins
+        run: |
+          mkdir -p ~/.config
+          ln -s "$PWD" ~/.config/nvim
+          nvim --headless -c 'Lazy! sync' -c 'qa' 2>&1
+
+      - name: Verify startup
+        run: |
+          nvim --headless --startuptime /tmp/startup.log -c 'qa' 2>&1
+          tail -5 /tmp/startup.log
+
+      - name: Verify custom commands
+        run: |
+          nvim --headless -c 'DevHealth' -c 'qa' 2>&1
+          nvim --headless -c 'checkhealth dev' -c 'qa' 2>&1
+          nvim --headless -c 'DevInfo' -c 'qa' 2>&1
+          nvim --headless -c 'DevReload' -c 'qa' 2>&1

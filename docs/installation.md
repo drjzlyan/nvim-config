@@ -53,7 +53,24 @@ nvim --startuptime /tmp/startup.log -c "q"
 tail -5 /tmp/startup.log
 ```
 
-The target is under 100 ms.
+The target is under 80 ms on Apple Silicon. Inside Neovim you can also run
+`:DevProfile`.
+
+## Verify the environment
+
+After installation, run:
+
+```vim
+:DevHealth
+```
+
+or
+
+```vim
+:checkhealth dev
+```
+
+Install any missing tools reported by the health check.
 
 ## Update plugins
 

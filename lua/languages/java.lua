@@ -6,23 +6,19 @@ local java_testing = require("languages.java-testing")
 
 local java_augroup = vim.api.nvim_create_augroup("JavaDev", { clear = true })
 
-local function setup_lsp()
-  local lspconfig = require("lspconfig")
+local function jdtls_config(bufnr)
+  local root = project.root(bufnr)
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   local ok, blink = pcall(require, "blink.cmp")
   if ok then
-    capabilities = blink.get_lsp_capabilities()
+    capabilities = blink.get_lsp_capabilities(capabilities)
   end
 
-  lspconfig.jdtls.setup({
+  return {
+    cmd = java_util.jdtls_cmd(root),
+    root_dir = root,
     capabilities = capabilities,
-    root_dir = function(path)
-      return project.root(path)
-    end,
     single_file_support = true,
-    on_new_config = function(new_config, new_root_dir)
-      new_config.cmd = java_util.jdtls_cmd(new_root_dir)
-    end,
     init_options = {
       bundles = require("languages.java-debug").bundles(),
     },
@@ -61,17 +57,28 @@ local function setup_lsp()
     },
     on_attach = function(client, bufnr)
       if client:supports_method("textDocument/codeLens") then
-        vim.lsp.codelens.refresh({ bufnr = bufnr })
+        vim.lsp.codelens.enable(true, { bufnr = bufnr })
       end
     end,
-  })
+  }
 end
 
 vim.api.nvim_create_autocmd("FileType", {
   group = java_augroup,
   pattern = "java",
   callback = function(args)
-    setup_lsp()
+    if vim.fn.executable("jdtls") ~= 1 then
+      vim.notify("jdtls is not installed. Install it with: brew install jdtls", vim.log.levels.WARN)
+      java_commands.register_commands(args.buf)
+      java_commands.register_keymaps(args.buf)
+      return
+    end
+    local ok, jdtls = pcall(require, "jdtls")
+    if not ok then
+      vim.notify("nvim-jdtls is not available", vim.log.levels.ERROR)
+      return
+    end
+    jdtls.start_or_attach(jdtls_config(args.buf))
     java_commands.register_commands(args.buf)
     java_commands.register_keymaps(args.buf)
   end,
@@ -82,7 +89,7 @@ vim.api.nvim_create_autocmd({ "BufWritePost", "BufEnter" }, {
   pattern = "*.java",
   callback = function(args)
     if vim.lsp.codelens then
-      vim.lsp.codelens.refresh({ bufnr = args.buf })
+      vim.lsp.codelens.enable(true, { bufnr = args.buf })
     end
   end,
 })

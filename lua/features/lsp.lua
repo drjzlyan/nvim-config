@@ -2,6 +2,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     ft = { "lua", "json", "yaml", "sh", "zsh", "toml", "markdown" },
+    dependencies = { "saghen/blink.cmp" },
     config = function()
       -- Diagnostics
       vim.diagnostic.config({
@@ -25,16 +26,6 @@ return {
           },
         },
       })
-
-      -- Rounded borders for LSP floats
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(
-        vim.lsp.handlers.hover,
-        { border = "rounded" }
-      )
-      vim.lsp.handlers["textDocument/signatureHelp"] = vim.lsp.with(
-        vim.lsp.handlers.signature_help,
-        { border = "rounded" }
-      )
 
       -- Keymaps active only when a language server attaches
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -72,12 +63,19 @@ return {
         end,
       })
 
-      local capabilities = require("blink.cmp").get_lsp_capabilities()
+      local capabilities = vim.lsp.protocol.make_client_capabilities()
+      local ok, blink = pcall(require, "blink.cmp")
+      if ok then
+        capabilities = blink.get_lsp_capabilities(capabilities)
+      end
 
+      -- Ensure lspconfig server definitions are registered with vim.lsp.config.
       local lspconfig = require("lspconfig")
+      _ = lspconfig
+
       local flags = { debounce_text_changes = 150 }
 
-      lspconfig.lua_ls.setup({
+      vim.lsp.config("lua_ls", {
         capabilities = capabilities,
         flags = flags,
         settings = {
@@ -92,12 +90,22 @@ return {
           },
         },
       })
+      vim.lsp.enable("lua_ls")
 
-      lspconfig.jsonls.setup({ capabilities = capabilities, flags = flags })
-      lspconfig.yamlls.setup({ capabilities = capabilities, flags = flags })
-      lspconfig.bashls.setup({ capabilities = capabilities, flags = flags })
-      lspconfig.taplo.setup({ capabilities = capabilities, flags = flags })
-      lspconfig.marksman.setup({ capabilities = capabilities, flags = flags })
+      vim.lsp.config("jsonls", { capabilities = capabilities, flags = flags })
+      vim.lsp.enable("jsonls")
+
+      vim.lsp.config("yamlls", { capabilities = capabilities, flags = flags })
+      vim.lsp.enable("yamlls")
+
+      vim.lsp.config("bashls", { capabilities = capabilities, flags = flags })
+      vim.lsp.enable("bashls")
+
+      vim.lsp.config("taplo", { capabilities = capabilities, flags = flags })
+      vim.lsp.enable("taplo")
+
+      vim.lsp.config("marksman", { capabilities = capabilities, flags = flags })
+      vim.lsp.enable("marksman")
     end,
   },
 }

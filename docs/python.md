@@ -1,9 +1,8 @@
 # Python development environment
 
-Phase 4 adds first-class Python support. The implementation is intentionally
-narrow: only Python is covered, and no new plugins are added. The tools are
-managed externally (by `uv`, Homebrew, or your system package manager) and wired
-together through `nvim-lspconfig`.
+Phase 4 adds first-class Python support. The tools are managed externally (by
+`uv`, Homebrew, or your system package manager) and wired together through
+`vim.lsp.config` and `vim.lsp.enable`.
 
 ## Architecture
 
@@ -55,6 +54,9 @@ etc.
 
 ## LSP servers
 
+Python LSP servers are configured with `vim.lsp.config` and enabled with
+`vim.lsp.enable` in `lua/languages/python.lua`.
+
 ### basedpyright
 
 `basedpyright` handles:
@@ -68,15 +70,16 @@ etc.
 - Semantic tokens
 - Type diagnostics
 
-The interpreter path is detected automatically from the project root. The search
-order is:
+The interpreter path is detected automatically from the project root when a
+Python buffer attaches. The search order is:
 
 1. `VIRTUAL_ENV` environment variable
 2. `root/.venv/bin/python` (and `Scripts/python.exe` on Windows)
 3. `root/venv/bin/python` (and `Scripts/python.exe` on Windows)
 
 This covers `venv`, `.venv`, and `uv` virtual environments, all of which default
-to the `.venv` directory.
+to the `.venv` directory. The detected path is sent to `basedpyright` through a
+`workspace/didChangeConfiguration` notification after the server attaches.
 
 ### Ruff
 
@@ -132,9 +135,10 @@ Both steps are synchronous so the save never races with the formatter.
 
 ## Virtual environment detection
 
-The active virtual environment is detected before LSP servers start and passed
-to `basedpyright` through `python.pythonPath`. If no project interpreter is
-found, `basedpyright` falls back to its default search behavior.
+The active virtual environment is detected when a Python buffer attaches and is
+passed to `basedpyright` through a `workspace/didChangeConfiguration`
+notification. If no project interpreter is found, `basedpyright` falls back to
+its default search behavior.
 
 To verify which interpreter Neovim selected for the current buffer, press
 `<leader>pv`.

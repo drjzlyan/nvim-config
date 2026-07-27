@@ -1,5 +1,8 @@
 local function in_git_repo()
-  local result = vim.fn.system("git rev-parse --is-inside-work-tree 2>/dev/null")
+  local ok, result = pcall(vim.fn.system, { "git", "rev-parse", "--is-inside-work-tree" })
+  if not ok or not result then
+    return false
+  end
   return vim.trim(result) == "true"
 end
 
@@ -31,7 +34,7 @@ local function lazygit_float()
 
   vim.bo[buf].bufhidden = "wipe"
 
-  vim.fn.jobstart("lazygit", {
+  local jobid = vim.fn.jobstart("lazygit", {
     term = true,
     on_exit = function()
       vim.schedule(function()
@@ -41,6 +44,12 @@ local function lazygit_float()
       end)
     end,
   })
+
+  if jobid <= 0 then
+    vim.api.nvim_win_close(win, true)
+    vim.notify("Could not start lazygit", vim.log.levels.ERROR)
+    return
+  end
 
   vim.cmd("startinsert")
 end

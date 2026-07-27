@@ -4,10 +4,34 @@
 
 Language support is implemented in two capability files:
 
-- `lua/features/lsp.lua` — diagnostics, LSP keymaps, handlers, and server setup
-- `lua/features/completion.lua` — `blink.cmp`, `LuaSnip`, and snippets
+- `lua/features/lsp.lua` — diagnostics, LSP keymaps, and server enablement.
+- `lua/features/completion.lua` — `blink.cmp`, `blink.lib`, `LuaSnip`, and
+  snippets.
+
+Language-specific LSP wiring lives under `lua/languages/`.
 
 This split keeps LSP and completion concerns independent.
+
+## Neovim 0.11 APIs
+
+The configuration uses `vim.lsp.config(name, cfg)` and `vim.lsp.enable(name)`
+instead of the deprecated `lspconfig.*.setup()` framework. `nvim-lspconfig` is
+still required so its server definitions are registered, but setup is handled
+by Neovim's native API.
+
+Example from `lua/features/lsp.lua`:
+
+```lua
+vim.lsp.config("lua_ls", {
+  capabilities = capabilities,
+  settings = {
+    Lua = {
+      diagnostics = { globals = { "vim" } },
+    },
+  },
+})
+vim.lsp.enable("lua_ls")
+```
 
 ## Completion architecture
 
@@ -29,20 +53,26 @@ duplicate completion configuration.
 
 Servers are installed and updated externally with Homebrew. Mason is not used.
 
-| Server | Filetype(s) | Homebrew package |
-|--------|-------------|------------------|
+| Server | Filetype(s) | Package |
+|--------|-------------|---------|
 | `lua_ls` | `lua` | `lua-language-server` |
 | `jsonls` | `json` | `vscode-json-languageserver` |
 | `yamlls` | `yaml` | `yaml-language-server` |
 | `bashls` | `sh`, `zsh` | `bash-language-server` |
 | `taplo` | `toml` | `taplo` |
 | `marksman` | `markdown` | `marksman` |
+| `jdtls` | `java` | `jdtls` |
+| `basedpyright` | `python` | `basedpyright` |
+| `ruff` | `python` | `ruff` |
 
-Install all supported servers:
+Install the config-file servers:
 
 ```bash
 brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman
 ```
+
+Python and Java servers are documented in [`python.md`](python.md) and
+[`java.md`](java.md).
 
 ## Diagnostics
 
@@ -55,14 +85,13 @@ Diagnostics are configured globally in `lua/features/lsp.lua`:
 
 ## LSP UI
 
-- Hover and signature help use rounded borders.
+- Hover and signature help use rounded borders via the keymap callbacks.
 - Text changes are debounced by 150 ms per server.
 - No automatic popups besides completion.
 
 ## Not included
 
 - Mason
-- Java, Python, TypeScript language servers
-- Debug adapters
 - AI coding plugins
-- Formatting plugins such as `conform.nvim` (only LSP formatting is wired)
+- Generic formatting plugins (Java formatting uses `conform.nvim` with
+  `google-java-format`; Python formatting uses `ruff`)

@@ -8,7 +8,7 @@ map({ "n", "v" }, "<Space>", "<Nop>", opts)
 map("n", "<Esc>", "<cmd>nohlsearch<CR>", opts)
 
 -- Save / quit
-map("n", "<leader>W", "<cmd>w!<CR>", { desc = "Save" })
+map("n", "<leader>S", "<cmd>w!<CR>", { desc = "Save" })
 map("n", "<leader>Z", "<cmd>q!<CR>", { desc = "Quit" })
 
 -- Buffers

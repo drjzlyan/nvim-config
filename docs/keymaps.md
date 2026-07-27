@@ -7,7 +7,7 @@ Leader: `<Space>`
 | Key | Mode | Action |
 |-----|------|--------|
 | `<Esc>` | n | Clear search highlight |
-| `<leader>W` | n | Save |
+| `<leader>S` | n | Save |
 | `<leader>Z` | n | Quit |
 | `<leader>c` | n | Close buffer |
 | `<leader>-` | n | Split below |
@@ -142,9 +142,17 @@ Java keymaps are active only in Java buffers.
 |-----|------|--------|
 | `<leader>jf` | n / v | Format with google-java-format |
 | `<leader>ji` | n | Organize imports |
+| `<leader>jr` | n / v | Refactor menu |
 | `<leader>jc` | n | Compile project |
-| `<leader>jm` | n | Run Maven |
-| `<leader>jg` | n | Run Gradle |
+| `<leader>jp` | n | Package project |
+| `<leader>jv` | n | Verify project |
+| `<leader>jt` | n | Run nearest test |
+| `<leader>jT` | n | Run test class |
+| `<leader>jd` | n | Debug nearest test |
+| `<leader>jD` | n | Debug test class |
+| `<leader>jh` | n | Call / type hierarchy |
+| `<leader>jl` | n | Workspace logs |
+| `<leader>jw` | n | Restart workspace |
 
 ## Debug (`nvim-dap`)
 
@@ -196,9 +204,32 @@ Sessions are saved/restored automatically per project. Manual commands:
 
 Press `<leader>` and pause to see groups via `which-key.nvim`.
 
-Reserved groups for later phases:
+## Testing
 
-- `<leader>d` — Debug
+Testing keymaps are generic and work in any buffer supported by a registered
+test provider.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>Tt` | n | Run nearest test |
+| `<leader>Tc` | n | Run test class |
+| `<leader>Tp` | n | Run package tests |
+| `<leader>Tm` | n | Run module tests |
+| `<leader>Tl` | n | Re-run last test |
+| `<leader>Td` | n | Debug nearest test |
+| `<leader>TD` | n | Debug test class |
+
+## Workspace
+
+Workspace keymaps are Java-specific and manage the jdtls workspace.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>Wb` | n | Build workspace |
+| `<leader>Wr` | n | Reload workspace configuration |
+| `<leader>Ww` | n | Restart jdtls |
+| `<leader>Wc` | n | Clear workspace cache |
+| `<leader>Wl` | n | Open workspace logs |
 
 ## Terminal / Tasks
 

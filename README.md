@@ -207,14 +207,44 @@ Key highlights:
 
 See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
 
+### Phase 9 (done)
+
+Enterprise-grade Java development with testing, refactoring, call hierarchy,
+and workspace management.
+
+Tools (installed externally):
+
+- `jdtls` — Java language server
+- `java-debug` / `java-test` — test runner and debugger integration
+- `google-java-format` — formatter
+- `maven`, `gradle` — build tools
+
+Key highlights:
+
+- jdtls CodeLens enabled with automatic refresh on save and buffer enter
+- JUnit 4, JUnit 5, and TestNG test runner via `nvim-jdtls`
+- Test commands: nearest test, current class, package, module, re-run last,
+  debug nearest, debug class
+- Project commands for Maven and Gradle: compile, clean, package, install,
+  test, verify
+- Import helpers: organize, add missing, remove unused
+- Refactoring: extract method/variable/constant, inline variable, move type,
+  rename
+- Call hierarchy, type hierarchy, and implementation hierarchy
+- Workspace commands: build, reload, restart jdtls, clear cache, open logs
+- Dedicated `which-key` groups for Java, Testing, and Workspace
+- Reused jdtls workspace per project for fast startup
+
+See [`docs/java.md`](docs/java.md) for the full Java workflow.
+
 ## Directory layout
 
 | Path | Purpose |
 |------|---------|
 | `lua/core` | Options, keymaps, autocommands, lazy bootstrap |
-| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, debugger, terminal, tasks, which-key, lsp, completion) |
-| `lua/languages` | Language-specific settings, LSP configs, and debug adapters (`python.lua`, `java.lua`, etc.) |
-| `lua/util` | Shared helper functions |
+| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, debugger, terminal, tasks, testing, which-key, lsp, completion) |
+| `lua/languages` | Language-specific settings, LSP configs, and debug adapters (`python.lua`, `java.lua`, `java-commands.lua`, `java-project.lua`, `java-testing.lua`, etc.) |
+| `lua/util` | Shared helper functions (`helpers.lua`, `project.lua`, `java.lua`) |
 | `after` | Runtime overrides such as `ftplugin` |
 | `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python, java, debugging, terminal, tasks |
 

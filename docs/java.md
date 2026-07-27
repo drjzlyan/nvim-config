@@ -1,16 +1,22 @@
 # Java Development
 
-This document describes the Java development environment added in Phase 5.
+This document describes the Java development environment added in Phase 5 and
+extended in Phase 9.
 
 ## Architecture
 
-Java support is split across two files to keep concerns separate:
+Java support is split across several files to keep concerns separate:
 
 - `lua/features/java.lua` — plugin configuration for `conform.nvim`, which runs
   `google-java-format`.
-- `lua/languages/java.lua` — language-specific logic: JDK detection, Lombok
-  discovery, `jdtls` command construction, project detection, commands,
-  keymaps, and format-on-save.
+- `lua/languages/java.lua` — `jdtls` setup, autocommands, and provider
+  registrations.
+- `lua/languages/java-commands.lua` — buffer-local commands and keymaps for
+  imports, refactoring, call hierarchy, and workspace management.
+- `lua/languages/java-project.lua` — Maven and Gradle project command helpers.
+- `lua/languages/java-testing.lua` — Java test runner adapter for the generic
+  testing module.
+- `lua/util/java.lua` — shared JDK, Lombok, and jdtls command helpers.
 
 Generic LSP keymaps, diagnostics, and handlers remain in `lua/features/lsp.lua`.
 
@@ -21,6 +27,10 @@ Install these with Homebrew (the configuration does not install them for you):
 ```bash
 brew install openjdk@8 openjdk@11 openjdk@17 jdtls lombok google-java-format maven gradle
 ```
+
+For test debugging you also need `java-debug` and `java-test` bundles. Add their
+extension JARs to the folders searched by `lua/languages/java-debug.lua` or
+adjust the glob patterns there.
 
 ## Workspace layout
 
@@ -94,9 +104,18 @@ Projects are detected by looking for any of:
 The project root is the first directory (searching upward from the current file)
 that contains one of these files, falling back to the file's directory.
 
-`<leader>jc` compiles the current project using Maven or Gradle depending on
-the project type. `<leader>jm` and `<leader>jg` open a terminal ready for
-Maven or Gradle commands, respectively.
+`<leader>jc` compiles the current project, `<leader>jp` packages it, and
+`<leader>jv` runs the verification goal. The exact command is chosen based on
+the build system:
+
+| Command | Maven | Gradle |
+|---------|-------|--------|
+| Compile | `mvn compile` | `gradle classes` |
+| Package | `mvn package` | `gradle assemble` |
+| Verify  | `mvn verify`  | `gradle check` |
+| Test    | `mvn test`    | `gradle test` |
+| Clean   | `mvn clean`   | `gradle clean` |
+| Install | `mvn install` | `gradle publishToMavenLocal` |
 
 ## LSP features
 
@@ -112,34 +131,99 @@ Maven or Gradle commands, respectively.
 - Document symbols
 - Call hierarchy
 - Code actions
-- Organize imports
+
+## CodeLens
+
+jdtls CodeLens is enabled for references and implementations. Lenses refresh
+automatically when you save a `*.java` file or enter a Java buffer.
+
+## Imports
+
+Buffer-local commands and keymaps are available for import management:
+
+| Key / Command | Action |
+|---------------|--------|
+| `<leader>ji` / `:JavaOrganizeImports` | Organize imports |
+| `:JavaAddMissingImports` | Add missing imports |
+| `:JavaRemoveUnusedImports` | Remove unused imports |
+
+## Refactoring
+
+jdtls refactorings are exposed as direct commands and keymaps:
+
+| Command | Action |
+|---------|--------|
+| `:JavaExtractMethod` | Extract method |
+| `:JavaExtractVariable` | Extract variable |
+| `:JavaExtractConstant` | Extract constant |
+| `:JavaInlineVariable` | Inline variable |
+| `:JavaMoveType` | Move type |
+| `<leader>lr` / `:JavaRename` | Rename symbol |
+
+`<leader>jr` opens the full refactor code-action menu.
+
+## Call and type hierarchy
+
+| Key / Command | Action |
+|---------------|--------|
+| `:JavaIncomingCalls` | Incoming call hierarchy |
+| `:JavaOutgoingCalls` | Outgoing call hierarchy |
+| `<leader>jh` / `:JavaTypeHierarchy` | Type hierarchy |
+| `:JavaImplementationHierarchy` | Implementation hierarchy |
+
+## Testing
+
+The generic testing layer in `lua/features/testing.lua` delegates Java test
+execution to `lua/languages/java-testing.lua`, which uses `nvim-jdtls` for
+nearest-method and class-level tests. Package and module test runs fall back to
+the detected build tool.
+
+Supported frameworks: JUnit 4, JUnit 5, and TestNG.
+
+| Key | Action |
+|-----|--------|
+| `<leader>jt` | Run nearest test |
+| `<leader>jT` | Run current class tests |
+| `<leader>Tt` | Run nearest test (Testing menu) |
+| `<leader>Tc` | Run current class tests (Testing menu) |
+| `<leader>Tp` | Run package tests |
+| `<leader>Tm` | Run module tests |
+| `<leader>Tl` | Re-run last test |
+| `<leader>jd` | Debug nearest test |
+| `<leader>jD` | Debug current class tests |
+| `<leader>Td` | Debug nearest test (Testing menu) |
+| `<leader>TD` | Debug current class tests (Testing menu) |
+
+## Workspace management
+
+| Key / Command | Action |
+|---------------|--------|
+| `<leader>Wb` / `:JavaBuildWorkspace` | Build workspace |
+| `<leader>Wr` / `:JavaReloadWorkspace` | Reload workspace configuration |
+| `<leader>Ww` / `:JavaRestartJdtls` | Restart jdtls |
+| `<leader>Wc` / `:JavaClearWorkspaceCache` | Clear workspace cache |
+| `<leader>Wl` / `:JavaOpenWorkspaceLogs` | Open workspace logs |
+| `<leader>jw`, `<leader>jl` | Alias keymaps for restart and logs |
 
 ## Keymaps
+
+Java keymaps are active only in Java buffers.
 
 | Key | Mode | Action |
 |-----|------|--------|
 | `<leader>jf` | n / v | Format with google-java-format |
 | `<leader>ji` | n | Organize imports |
+| `<leader>jr` | n / v | Refactor menu |
 | `<leader>jc` | n | Compile project |
-| `<leader>jm` | n | Run Maven |
-| `<leader>jg` | n | Run Gradle |
-
-## Task provider
-
-Java is also registered as a generic task provider in `lua/languages/java.lua`.
-When the current buffer is in a Maven or Gradle project, the `<leader>t` task
-keymaps dispatch to this provider:
-
-| Task | Maven command | Gradle command |
-|------|---------------|----------------|
-| Build | `mvn package` | `gradle build` |
-| Test | `mvn test` | `gradle test` |
-| Run current file | not supported | not supported |
-| Run project | `mvn` | `gradle` |
-| Clean | `mvn clean` | `gradle clean` |
-
-See [`docs/tasks.md`](docs/tasks.md) for the provider API and how to add new
-adapters.
+| `<leader>jp` | n | Package project |
+| `<leader>jv` | n | Verify project |
+| `<leader>jt` | n | Run nearest test |
+| `<leader>jT` | n | Run test class |
+| `<leader>jd` | n | Debug nearest test |
+| `<leader>jD` | n | Debug test class |
+| `<leader>jh` | n | Call / type hierarchy |
+| `<leader>jl` | n | Workspace logs |
+| `<leader>jw` | n | Restart workspace |
 
 ## Performance
 
@@ -147,3 +231,5 @@ adapters.
 - Build output directories (`target/`, `build/`, `.gradle/`, `.idea/`) are
   excluded from wild searches via `wildignore`.
 - Workspaces are reused per project, avoiding costly re-imports.
+- Project metadata is cached in `lua/util/project.lua` and reused by Java
+  project, testing, and task providers.

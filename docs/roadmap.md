@@ -90,6 +90,25 @@ See `docs/plugins.md` and `docs/keymaps.md` for details.
 
 See [`docs/terminal.md`](docs/terminal.md) and [`docs/tasks.md`](docs/tasks.md) for details.
 
+## Phase 9 — Enterprise Java (done)
+
+- [x] jdtls CodeLens enabled and refreshed on save / buffer enter
+- [x] Generic testing layer (`lua/features/testing.lua`) with Java adapter
+- [x] Test runner support for JUnit 4, JUnit 5, and TestNG
+- [x] Test commands: nearest, current class, package, module, re-run last,
+  debug nearest, debug class
+- [x] Maven and Gradle project commands: compile, clean, package, install,
+  test, verify
+- [x] Import helpers: organize, add missing, remove unused
+- [x] Refactoring commands: extract method/variable/constant, inline variable,
+  move type, rename
+- [x] Call hierarchy, type hierarchy, implementation hierarchy
+- [x] Workspace commands: build, reload, restart jdtls, clear cache, open logs
+- [x] `which-key` groups for Java, Testing, and Workspace
+- [x] Reused jdtls workspace and cached project metadata
+
+See [`docs/java.md`](docs/java.md) for details.
+
 ## Non-goals
 
 - Re-implementing LazyVim, NvChad, AstroNvim, or Kickstart.

@@ -134,6 +134,37 @@ Python keymaps are active only in Python buffers.
 | `<leader>pf` | n / v | Format with Ruff |
 | `<leader>pv` | n | Show active virtual environment |
 
+## Java
+
+Java keymaps are active only in Java buffers.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>jf` | n / v | Format with google-java-format |
+| `<leader>ji` | n | Organize imports |
+| `<leader>jc` | n | Compile project |
+| `<leader>jm` | n | Run Maven |
+| `<leader>jg` | n | Run Gradle |
+
+## Git
+
+Git keymaps are active only inside Git repositories.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>gg` | n | Open LazyGit (floating terminal) |
+| `<leader>gd` | n | Open Diffview (current changes) |
+| `<leader>gh` | n | Preview hunk |
+| `<leader>gb` | n | Blame current line |
+| `<leader>gs` | n / v | Stage hunk |
+| `<leader>gr` | n / v | Reset hunk |
+| `<leader>gu` | n | Undo stage hunk |
+| `<leader>gn` | n | Next hunk |
+| `<leader>gp` | n | Previous hunk |
+| `<leader>gD` | n | Diff against index |
+
+See `docs/roadmap.md` and `docs/plugins.md` for the full Git workflow.
+
 ## Session (`auto-session`)
 
 Sessions are saved/restored automatically per project. Manual commands:

@@ -25,6 +25,7 @@ nvim-config/
 │   │   ├── todo.lua
 │   │   ├── ui.lua
 │   │   ├── session.lua
+│   │   ├── git.lua
 │   │   └── whichkey.lua
 │   ├── languages/        # Per-language configuration
 │   └── util/             # Shared helpers
@@ -98,17 +99,65 @@ Tools (installed externally):
 
 See [`docs/python.md`](docs/python.md) for the full Python workflow.
 
-### Phase 5
+### Phase 5 (done)
 
-Git integration, debugging, formatting for other languages, and advanced pickers.
+Production-quality Java development environment for large Maven and Gradle
+projects.
+
+Tools (installed externally):
+
+- `openjdk@8`, `openjdk@11`, `openjdk@17` — JDKs
+- `jdtls` — Java language server
+- `lombok` — annotation processor (auto-configured as a Java agent)
+- `google-java-format` — formatter
+- `maven` — build tool
+- `gradle` — build tool
+
+See [`docs/java.md`](docs/java.md) for the full Java workflow.
+
+### Phase 6 (done)
+
+First-class Git experience inside Neovim.
+
+Plugins:
+
+- `lewis6991/gitsigns.nvim` — hunk signs, blame, preview, staging, diff
+- `sindrets/diffview.nvim` — diff current changes, branches, commits, file history
+
+External tools (managed outside Neovim):
+
+- `git`
+- `lazygit`
+- `delta`
+
+Key highlights:
+
+- `<leader>gg` opens `lazygit` in a floating terminal (`:LazyGit`)
+- `<leader>gd` opens `diffview.nvim` for the current changes
+- `<leader>gh`, `<leader>gb`, `<leader>gs`, `<leader>gr`, `<leader>gn`, `<leader>gp`
+  for hunk-level actions via `gitsigns.nvim`
+- Git plugins lazy-load only inside Git repositories
+- `which-key` registers the `<leader>g` group and all Git mappings
+
+Recommended workflow:
+
+1. Stage, reset, preview, and navigate hunks with the `<leader>g` mappings.
+2. Open `<leader>gd` to review all current changes in a full diff view.
+3. Use `:DiffviewOpen branch...HEAD` to compare against another branch.
+4. Use `:DiffviewOpen <commit>` to inspect a specific commit.
+5. Use `:DiffviewFileHistory %` for the history of the current file.
+6. Drop into `<leader>gg` (`:LazyGit`) for branch management, rebasing, commits,
+   and interactive staging.
+
+See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
 
 ## Directory layout
 
 | Path | Purpose |
 |------|---------|
 | `lua/core` | Options, keymaps, autocommands, lazy bootstrap |
-| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, which-key, lsp, completion) |
-| `lua/languages` | Language-specific settings and LSP configs (`python.lua`, etc.) |
+| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, which-key, lsp, completion) |
+| `lua/languages` | Language-specific settings and LSP configs (`python.lua`, `java.lua`, etc.) |
 | `lua/util` | Shared helper functions |
 | `after` | Runtime overrides such as `ftplugin` |
 | `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python |
@@ -127,9 +176,11 @@ Git integration, debugging, formatting for other languages, and advanced pickers
   - `<leader>e` — Explorer
   - `<leader>f` — Files
   - `<leader>s` — Search
+  - `<leader>g` — Git
   - `<leader>q` — Session
   - `<leader>l` — LSP
   - `<leader>p` — Python
+  - `<leader>j` — Java
   - `<leader>d` — Debug (future)
   - `<leader>t` — Terminal (future)
 - `which-key` makes every group discoverable.
@@ -163,9 +214,10 @@ Homebrew:
 | `bashls` | Bash / Zsh | `bash-language-server` |
 | `taplo` | TOML | `taplo` |
 | `marksman` | Markdown | `marksman` |
+| `jdtls` | Java | `jdtls` |
 
 ```bash
-brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman
+brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman jdtls
 ```
 
 ## Installation
@@ -197,4 +249,5 @@ The `lazy-lock.json` is committed for reproducibility.
 - [`docs/editing.md`](docs/editing.md)
 - [`docs/lsp.md`](docs/lsp.md)
 - [`docs/python.md`](docs/python.md)
+- [`docs/java.md`](docs/java.md)
 - [`docs/roadmap.md`](docs/roadmap.md)

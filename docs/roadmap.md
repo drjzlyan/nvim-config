@@ -44,11 +44,33 @@ Goal: make editing excellent before adding language intelligence.
 
 See [`docs/python.md`](docs/python.md) for details.
 
-## Phase 5 — Workflow integrations
+## Phase 5 — Java development environment (done)
 
-- [ ] Git integration (`gitsigns.nvim` / `fugitive`)
+- [x] Java treesitter parser
+- [x] `jdtls` LSP (definition, references, rename, hover, implementation, type definition, workspace symbols, document symbols, call hierarchy, code actions)
+- [x] JDK auto-detection (8, 11, 17) with `JAVA_HOME` respect
+- [x] Lombok auto-configuration via Homebrew
+- [x] `google-java-format` formatting via `conform.nvim`
+- [x] Format on save for Java
+- [x] Maven and Gradle project detection
+- [x] Java keymaps and which-key group
+
+See [`docs/java.md`](docs/java.md) for details.
+
+## Phase 6 — Git integration (done)
+
+- [x] Hunk signs, blame, preview, staging, and diff (`gitsigns.nvim`)
+- [x] Diff current changes, branches, commits, and file history (`diffview.nvim`)
+- [x] Floating LazyGit terminal (`:LazyGit`)
+- [x] Lazy-load Git plugins only inside Git repositories
+- [x] Git keymaps and `which-key` group
+
+See `docs/plugins.md` and `docs/keymaps.md` for details.
+
+## Phase 7 — Workflow integrations
+
 - [ ] Debugger (`nvim-dap`)
-- [ ] Formatting and linting for other languages (`conform.nvim`, `nvim-lint`)
+- [ ] Formatting and linting for other languages (`nvim-lint`)
 - [ ] Additional pickers and advanced `snacks.nvim` modules as needed
 
 ## Non-goals

@@ -38,6 +38,21 @@ Language-aware editing: LSP, completion, and snippets.
 | `L3MON4D3/LuaSnip` | Snippet expansion engine | Bundled with completion |
 | `rafamadriz/friendly-snippets` | Common snippet definitions | Bundled with completion |
 
+## Phase 6
+
+Git integration inside Neovim.
+
+| Plugin | Purpose | Lazy? |
+|--------|---------|-------|
+| `lewis6991/gitsigns.nvim` | Hunk signs, blame, preview, staging, diff | Only in Git repos |
+| `sindrets/diffview.nvim` | Diff current changes, branches, commits, file history | Only in Git repos |
+
+External tools:
+
+- `git`
+- `lazygit`
+- `delta` (used by `lazygit` for pager output)
+
 ## Rationale
 
 - **No Telescope**: `fzf-lua` is used instead because it leverages the same
@@ -51,6 +66,9 @@ Language-aware editing: LSP, completion, and snippets.
   Neovim configuration separate from toolchain management.
 - **`blink.cmp`**: replaces `nvim-cmp` with a single, fast completion plugin
   that supports LSP, buffer, path, and snippet sources.
+- **No `vim-fugitive`**: `gitsigns.nvim` handles hunk-level actions, blame, and
+  diff, `diffview.nvim` handles broader diffs, and `lazygit` covers complex Git
+  workflows from a floating terminal.
 
 ## Disabled snacks modules
 

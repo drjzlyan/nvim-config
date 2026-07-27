@@ -31,9 +31,11 @@ Each file returns a list of lazy.nvim specs that implement one capability:
 | `search.lua` | Search / pickers | `fzf-lua` |
 | `ui.lua` | Statusline / notifications | `lualine.nvim`, `snacks.nvim` |
 | `session.lua` | Session management | `auto-session` |
+| `git.lua` | Git workflow | `gitsigns.nvim`, `diffview.nvim` |
 | `whichkey.lua` | Discoverable keymaps | `which-key.nvim` |
 | `lsp.lua` | LSP clients, diagnostics, keymaps | `nvim-lspconfig` |
 | `completion.lua` | Completion, snippets | `blink.cmp`, `LuaSnip`, `friendly-snippets` |
+| `java.lua` | Java formatting | `conform.nvim` |
 
 ### `lua/languages`
 
@@ -42,6 +44,7 @@ Reserved for language-specific configuration and LSP servers.
 | File | Language | Servers / Tools |
 |------|----------|-----------------|
 | `python.lua` | Python | `basedpyright`, `ruff`, `uv`, `pytest` |
+| `java.lua` | Java | `jdtls`, `google-java-format`, `maven`, `gradle` |
 
 ### `lua/util`
 

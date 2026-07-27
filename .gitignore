@@ -1,0 +1,8 @@
+# Neovim swap / backup
+*.swp
+*.swo
+*~
+.netrwhist
+
+# Lazy.nvim state is managed automatically.
+# lazy-lock.json is intentionally committed for reproducibility.

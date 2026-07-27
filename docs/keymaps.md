@@ -118,6 +118,22 @@ Leader: `<Space>`
 | `<leader>ls` | n | Workspace symbols |
 | `<leader>ld` | n | Document symbols |
 
+## Python
+
+Python keymaps are active only in Python buffers.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>pr` | n | Run current file |
+| `<leader>pm` | n | Run current module |
+| `<leader>ps` | v | Run selected code |
+| `<leader>pt` | n | pytest current file |
+| `<leader>ptf` | n | pytest current function / method |
+| `<leader>ptp` | n | pytest whole project |
+| `<leader>pi` | n | Organize imports |
+| `<leader>pf` | n / v | Format with Ruff |
+| `<leader>pv` | n | Show active virtual environment |
+
 ## Session (`auto-session`)
 
 Sessions are saved/restored automatically per project. Manual commands:

@@ -12,6 +12,7 @@ return {
         -- Only the parsers needed for configuration files and editing basics
         ensure_installed = {
           "lua",
+          "python",
           "vim",
           "vimdoc",
           "bash",

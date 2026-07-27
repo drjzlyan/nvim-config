@@ -14,6 +14,7 @@ return {
         { "<leader>s", group = "Search" },
         { "<leader>d", group = "Debug" },
         { "<leader>l", group = "LSP" },
+        { "<leader>p", group = "Python" },
         { "<leader>t", group = "Terminal" },
         { "<leader>q", group = "Session" },
         { "<leader>W", desc = "Save" },

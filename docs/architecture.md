@@ -37,8 +37,11 @@ Each file returns a list of lazy.nvim specs that implement one capability:
 
 ### `lua/languages`
 
-Reserved for language-specific configuration and LSP servers. Phase 1 is
-empty.
+Reserved for language-specific configuration and LSP servers.
+
+| File | Language | Servers / Tools |
+|------|----------|-----------------|
+| `python.lua` | Python | `basedpyright`, `ruff`, `uv`, `pytest` |
 
 ### `lua/util`
 

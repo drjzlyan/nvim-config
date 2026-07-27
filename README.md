@@ -84,9 +84,23 @@ Configured language servers (installed via Homebrew):
 - `taplo` — TOML
 - `marksman` — Markdown
 
-### Phase 4
+### Phase 4 (done)
 
-Git integration, debugging, formatting, and advanced pickers.
+First-class Python development environment.
+
+Tools (installed externally):
+
+- `uv` — project runner and virtual environments
+- `basedpyright` — type checking and LSP navigation
+- `ruff` — linting, formatting, import organization, code actions
+- `pytest` — running tests
+- `debugpy` — reserved for future debugging work
+
+See [`docs/python.md`](docs/python.md) for the full Python workflow.
+
+### Phase 5
+
+Git integration, debugging, formatting for other languages, and advanced pickers.
 
 ## Directory layout
 
@@ -94,10 +108,10 @@ Git integration, debugging, formatting, and advanced pickers.
 |------|---------|
 | `lua/core` | Options, keymaps, autocommands, lazy bootstrap |
 | `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, which-key, lsp, completion) |
-| `lua/languages` | Language-specific settings and LSP configs (future) |
+| `lua/languages` | Language-specific settings and LSP configs (`python.lua`, etc.) |
 | `lua/util` | Shared helper functions |
 | `after` | Runtime overrides such as `ftplugin` |
-| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp |
+| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python |
 
 ## Plugin philosophy
 
@@ -115,6 +129,7 @@ Git integration, debugging, formatting, and advanced pickers.
   - `<leader>s` — Search
   - `<leader>q` — Session
   - `<leader>l` — LSP
+  - `<leader>p` — Python
   - `<leader>d` — Debug (future)
   - `<leader>t` — Terminal (future)
 - `which-key` makes every group discoverable.
@@ -180,4 +195,6 @@ The `lazy-lock.json` is committed for reproducibility.
 - [`docs/keymaps.md`](docs/keymaps.md)
 - [`docs/treesitter.md`](docs/treesitter.md)
 - [`docs/editing.md`](docs/editing.md)
+- [`docs/lsp.md`](docs/lsp.md)
+- [`docs/python.md`](docs/python.md)
 - [`docs/roadmap.md`](docs/roadmap.md)

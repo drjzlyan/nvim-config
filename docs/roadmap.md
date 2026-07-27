@@ -67,9 +67,18 @@ See [`docs/java.md`](docs/java.md) for details.
 
 See `docs/plugins.md` and `docs/keymaps.md` for details.
 
-## Phase 7 — Workflow integrations
+## Phase 7 — Debugging (done)
 
-- [ ] Debugger (`nvim-dap`)
+- [x] DAP client, UI, virtual text, and REPL (`nvim-dap`, `nvim-dap-ui`, `nvim-dap-virtual-text`)
+- [x] Python debugging via `debugpy`
+- [x] Java debugging via `java-debug` / `java-test` through existing `jdtls`
+- [x] Breakpoints, conditional breakpoints, logpoints, and clear breakpoints
+- [x] Debugger keymaps and `which-key` group
+
+See `docs/plugins.md` and `docs/keymaps.md` for details.
+
+## Phase 8 — Workflow integrations
+
 - [ ] Formatting and linting for other languages (`nvim-lint`)
 - [ ] Additional pickers and advanced `snacks.nvim` modules as needed
 

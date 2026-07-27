@@ -16,7 +16,8 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   spec = {
     { import = "features" },
-    { import = "languages" },
+    { import = "languages.python" },
+    { import = "languages.java" },
   },
   defaults = {
     lazy = true,

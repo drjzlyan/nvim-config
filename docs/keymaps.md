@@ -146,6 +146,23 @@ Java keymaps are active only in Java buffers.
 | `<leader>jm` | n | Run Maven |
 | `<leader>jg` | n | Run Gradle |
 
+## Debug (`nvim-dap`)
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>db` | n | Toggle breakpoint |
+| `<leader>dB` | n | Conditional breakpoint |
+| `<leader>dc` | n | Continue / start debugging |
+| `<leader>di` | n | Step into |
+| `<leader>do` | n | Step over |
+| `<leader>dO` | n | Step out |
+| `<leader>dr` | n | Open REPL |
+| `<leader>du` | n | Toggle DAP UI |
+| `<leader>dt` | n | Terminate session |
+| `<leader>dx` | n | Clear all breakpoints |
+
+The debugger loads only when a debug keymap or command is used.
+
 ## Git
 
 Git keymaps are active only inside Git repositories.

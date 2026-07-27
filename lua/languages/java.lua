@@ -325,7 +325,7 @@ local function setup_lsp()
       new_config.cmd = jdtls_cmd(new_root_dir)
     end,
     init_options = {
-      bundles = {},
+      bundles = require("languages.java-debug").bundles(),
     },
     settings = {
       java = {

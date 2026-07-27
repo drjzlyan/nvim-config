@@ -151,16 +151,46 @@ Recommended workflow:
 
 See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
 
+### Phase 7 (done)
+
+Production-quality debugging for Python and Java.
+
+Plugins:
+
+- `mfussenegger/nvim-dap` — Debug Adapter Protocol client
+- `rcarriga/nvim-dap-ui` — debugging UI (scopes, breakpoints, watches, call stack, REPL, console)
+- `theHamsta/nvim-dap-virtual-text` — inline variable values and exceptions
+- `nvim-neotest/nvim-nio` — async I/O library used by `nvim-dap-ui`
+- `mfussenegger/nvim-jdtls` — jdtls DAP integration for Java (helper plugin)
+
+External tools (managed outside Neovim):
+
+- `debugpy`
+- `java-debug`
+- `java-test`
+
+Key highlights:
+
+- `<leader>d` group for all debugger mappings
+- `<leader>db` / `<leader>dB` for breakpoints and conditional breakpoints
+- `<leader>dc`, `<leader>di`, `<leader>do`, `<leader>dO` for execution control
+- `<leader>du` toggles the DAP UI, `<leader>dr` opens the REPL
+- DAP UI opens automatically when debugging starts and closes when it ends
+- Python `debugpy` auto-detects `.venv`
+- Java reuses the existing `jdtls` workspace and loads `java-debug` / `java-test` bundles
+
+See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
+
 ## Directory layout
 
 | Path | Purpose |
 |------|---------|
 | `lua/core` | Options, keymaps, autocommands, lazy bootstrap |
-| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, which-key, lsp, completion) |
-| `lua/languages` | Language-specific settings and LSP configs (`python.lua`, `java.lua`, etc.) |
+| `lua/features` | One file per capability (navigation, search, treesitter, editing, todo, ui, session, git, debugger, which-key, lsp, completion) |
+| `lua/languages` | Language-specific settings, LSP configs, and debug adapters (`python.lua`, `java.lua`, etc.) |
 | `lua/util` | Shared helper functions |
 | `after` | Runtime overrides such as `ftplugin` |
-| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python |
+| `docs` | Architecture, installation, keymaps, plugins, roadmap, treesitter, editing, lsp, python, java, debugging |
 
 ## Plugin philosophy
 
@@ -181,7 +211,7 @@ See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full wor
   - `<leader>l` — LSP
   - `<leader>p` — Python
   - `<leader>j` — Java
-  - `<leader>d` — Debug (future)
+  - `<leader>d` — Debug
   - `<leader>t` — Terminal (future)
 - `which-key` makes every group discoverable.
 
@@ -250,4 +280,5 @@ The `lazy-lock.json` is committed for reproducibility.
 - [`docs/lsp.md`](docs/lsp.md)
 - [`docs/python.md`](docs/python.md)
 - [`docs/java.md`](docs/java.md)
+- [`docs/debugging.md`](docs/debugging.md)
 - [`docs/roadmap.md`](docs/roadmap.md)

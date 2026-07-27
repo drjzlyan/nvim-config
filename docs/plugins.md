@@ -70,6 +70,24 @@ External tools:
   diff, `diffview.nvim` handles broader diffs, and `lazygit` covers complex Git
   workflows from a floating terminal.
 
+## Phase 7
+
+Debugging for Python and Java.
+
+| Plugin | Purpose | Lazy? |
+|--------|---------|-------|
+| `mfussenegger/nvim-dap` | Debug Adapter Protocol client | On debug command/keymap |
+| `rcarriga/nvim-dap-ui` | Scopes, breakpoints, watches, call stack, REPL, console | With `nvim-dap` |
+| `theHamsta/nvim-dap-virtual-text` | Inline variable values and exceptions | With `nvim-dap` |
+| `nvim-neotest/nvim-nio` | Async I/O for `nvim-dap-ui` | With `nvim-dap` |
+| `mfussenegger/nvim-jdtls` | jdtls DAP integration for Java | With `nvim-dap` |
+
+External tools:
+
+- `debugpy`
+- `java-debug`
+- `java-test`
+
 ## Disabled snacks modules
 
 - `dashboard`

@@ -32,6 +32,7 @@ Each file returns a list of lazy.nvim specs that implement one capability:
 | `ui.lua` | Statusline / notifications | `lualine.nvim`, `snacks.nvim` |
 | `session.lua` | Session management | `auto-session` |
 | `git.lua` | Git workflow | `gitsigns.nvim`, `diffview.nvim` |
+| `debugger.lua` | Debugging UI and keymaps | `nvim-dap`, `nvim-dap-ui`, `nvim-dap-virtual-text` |
 | `whichkey.lua` | Discoverable keymaps | `which-key.nvim` |
 | `lsp.lua` | LSP clients, diagnostics, keymaps | `nvim-lspconfig` |
 | `completion.lua` | Completion, snippets | `blink.cmp`, `LuaSnip`, `friendly-snippets` |
@@ -44,7 +45,9 @@ Reserved for language-specific configuration and LSP servers.
 | File | Language | Servers / Tools |
 |------|----------|-----------------|
 | `python.lua` | Python | `basedpyright`, `ruff`, `uv`, `pytest` |
+| `python-debug.lua` | Python debugging | `debugpy` |
 | `java.lua` | Java | `jdtls`, `google-java-format`, `maven`, `gradle` |
+| `java-debug.lua` | Java debugging | `java-debug`, `java-test` |
 
 ### `lua/util`
 

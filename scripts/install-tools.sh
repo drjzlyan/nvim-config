@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 TOOLS_DIR="${TOOLS_DIR:-$HOME/.local/share/ide-tools}"
 BIN_DIR="$TOOLS_DIR/bin"
 LANGUAGES_FILE="${LANGUAGES_FILE:-$HOME/.local/share/nvim/languages.local}"
@@ -164,8 +163,7 @@ install_vsix() {
   local name="$1"
   local version="$2"
   local url_pattern="$3"
-  local url
-  url=$(echo "$url_pattern" | sed "s/\${VERSION}/$version/g")
+  local url="${url_pattern//\$\{VERSION\}/$version}"
   local target="$TOOLS_DIR/$name-$version"
   if [[ -d "$target" ]]; then
     log "$name $version already installed"
@@ -206,12 +204,9 @@ main() {
     fi
   fi
 
-  # Java — jdtls version follows the Java major version selection
+  # Java — the Java runtime version is managed by mise, while jdtls is
+  # a tool that we install separately at a known stable version.
   if has_language "java"; then
-    local jdtls_ver
-    jdtls_ver=$(get_version "java")
-    # Use a known stable jdtls version for the workspace; the Java runtime
-    # version is managed by mise, while jdtls is a tool that we install.
     install_jdtls "1.40.0"
     install_lombok "1.18.34"
     install_vsix "java-debug" "0.58.0" \

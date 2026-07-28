@@ -46,7 +46,7 @@ later events.
 
 - Check that `mvn` or `gradle` is installed and the project root is detected
   (`:DevInfo`).
-- Build output appears in the dedicated `build` terminal (`<leader>tb`).
+- Run the build manually with `<leader>mb` and check the terminal output.
 
 ## Python projects
 
@@ -91,6 +91,5 @@ Use `:DevCleanCache` to clear:
 
 ## Still stuck?
 
-Open a terminal with `<leader>tt` and run the failing command directly to see
-raw output. Most task runners send commands to named terminals so errors are
-visible.
+Open a terminal with `<leader>t` and run the failing command directly to see
+raw output.

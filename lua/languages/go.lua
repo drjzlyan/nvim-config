@@ -74,16 +74,14 @@ local function organize_imports(bufnr)
   if not results then
     return
   end
-  for _, response in pairs(results) do
+  for client_id, response in pairs(results) do
     if response.result then
+      local client = vim.lsp.get_client_by_id(client_id)
       for _, action in ipairs(response.result) do
-        if action.edit or action.command then
-          local client = vim.lsp.get_client_by_id(1)
-          if action.edit and client then
-            vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
-          elseif action.command and client then
-            client:exec_cmd(action.command, { bufnr = bufnr })
-          end
+        if action.edit and client then
+          vim.lsp.util.apply_workspace_edit(action.edit, client.offset_encoding)
+        elseif action.command and client then
+          client:exec_cmd(action.command, { bufnr = bufnr })
         end
       end
     end

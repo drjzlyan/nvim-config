@@ -197,13 +197,12 @@ External tools (managed outside Neovim):
 
 Key highlights:
 
-- `<leader>t` menu combines terminal and task commands
-- `<leader>tt` / `<leader>tf` toggle horizontal and floating terminals
-- `<leader>ta`, `<leader>tg` toggle dedicated Agent and Git terminals
-- `<leader>tb`, `<leader>tr`, `<leader>ts`, `<leader>tc` run generic build, run, test, and clean tasks
-- Named terminals (Shell, Build, Test, Git, Agent) are reused, never duplicated
-- Generic task providers are language-agnostic; Python and Java adapters register automatically
-- Project detection via `pyproject.toml`, `pom.xml`, `build.gradle`, and `settings.gradle`
+- `<leader>t` toggles a floating terminal
+- `<leader>m` group for generic task commands: `<leader>mb` build, `<leader>ms` test, `<leader>mc` clean, `<leader>mp` run project
+- Task commands dispatch through the language provider detected for the current buffer
+- Falls back to `just` or `make` when no language provider matches
+- Generic task providers are language-agnostic; all six languages register automatically
+- Project detection via `pyproject.toml`, `pom.xml`, `build.gradle`, `go.mod`, `Cargo.toml`, `package.json`
 
 See the sections below and [`docs/keymaps.md`](docs/keymaps.md) for the full workflow.
 
@@ -288,7 +287,7 @@ and [`docs/faq.md`](docs/faq.md) for details.
 
 - `<Space>` is the leader key.
 - Plugin features are grouped by capability:
-  - `<leader>e` — Explorer
+  - `<leader>e` — Diagnostics/Errors
   - `<leader>f` — Files
   - `<leader>s` — Search
   - `<leader>g` — Git
@@ -297,7 +296,8 @@ and [`docs/faq.md`](docs/faq.md) for details.
   - `<leader>p` — Python
   - `<leader>j` — Java
   - `<leader>d` — Debug
-  - `<leader>t` — Terminal / Tasks
+  - `<leader>t` — Terminal
+  - `<leader>m` — Make / Tasks
 - `which-key` makes every group discoverable.
 
 ## LSP architecture

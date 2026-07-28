@@ -16,12 +16,22 @@ Leader: `<Space>`
 | `<C-h/j/k/l>` | n | Navigate windows |
 | `<A-j/k>` | n/v | Move line(s) |
 
+## Diagnostics (`trouble.nvim`)
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>ee` | n | Diagnostics list |
+| `<leader>er` | n | LSP references (Trouble) |
+| `<leader>ei` | n | LSP implementations (Trouble) |
+| `<leader>en` | n | Next trouble item |
+| `<leader>ep` | n | Previous trouble item |
+
 ## Explorer (`oil.nvim`)
 
 | Key | Action |
 |-----|--------|
-| `<leader>e` | Open oil at current file's directory |
-| `<leader>E` | Open oil at working directory |
+| `<leader>E` | Open oil at current file's directory |
+| `<leader>O` | Open oil at working directory |
 
 ## Files (`fzf-lua`)
 
@@ -257,24 +267,23 @@ Workspace keymaps are Java-specific and manage the jdtls workspace.
 | `<leader>Wc` | n | Clear workspace cache |
 | `<leader>Wl` | n | Open workspace logs |
 
-## Terminal / Tasks
-
-The `<leader>t` menu groups terminal and generic task commands.
+## Terminal
 
 | Key | Action |
 |-----|--------|
-| `<leader>tt` | Toggle terminal (horizontal) |
-| `<leader>tf` | Toggle floating terminal |
-| `<leader>ta` | Toggle Agent terminal (floating) |
-| `<leader>tg` | Toggle Git terminal (vertical) |
-| `<leader>tb` | Run build for the current project |
-| `<leader>tr` | Run the current file |
-| `<leader>ts` | Run tests for the current project |
-| `<leader>tp` | Run the current project |
-| `<leader>tc` | Clean build artifacts |
+| `<leader>t` | Toggle floating terminal |
 
-Build, test, and clean are dispatched through the task provider detected for
-the buffer. Python and Java adapters are registered automatically.
+## Make / Tasks (`<leader>m`)
+
+Generic task commands dispatched through the language provider detected for the
+current buffer. Falls back to `just` or `make` if no provider matches.
+
+| Key | Action |
+|-----|--------|
+| `<leader>mb` | Run build task |
+| `<leader>ms` | Run test task |
+| `<leader>mc` | Run clean task |
+| `<leader>mp` | Run project task |
 
 ## Developer commands
 

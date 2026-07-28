@@ -1,32 +1,34 @@
 # Task workflow
 
-Phase 8 adds language-agnostic task commands. Each language registers an
-adapter that knows how to build, test, run, and clean projects of that type. The
-generic `<leader>t` keymaps then dispatch to the adapter detected for the current
-buffer.
+Language-agnostic task commands live under `<leader>m`. Each language module
+registers a provider that knows how to build, test, run, and clean projects of
+that type. The `<leader>m` keymaps dispatch to the provider detected for the
+current buffer, falling back to `just` or `make` if none matches.
 
 ## Generic commands
 
 | Key | Task | Typical command |
 |-----|------|-----------------|
-| `<leader>tb` | Build | `mvn package`, `gradle build` |
-| `<leader>tr` | Run current file | `uv run python path/to/file.py` |
-| `<leader>ts` | Test | `pytest`, `mvn test`, `gradle test` |
-| `<leader>tp` | Run project | `uv run python -m module` |
-| `<leader>tc` | Clean | `mvn clean`, `gradle clean`, `find ... __pycache__ -exec rm -rf` |
+| `<leader>mb` | Build | `mvn package`, `cargo build`, `go build ./...`, `npm run build` |
+| `<leader>ms` | Test | `pytest`, `mvn test`, `cargo test`, `go test ./...`, `npm test` |
+| `<leader>mp` | Run project | `cargo run`, `go run .`, `npm start` |
+| `<leader>mc` | Clean | `mvn clean`, `cargo clean`, `go clean -cache`, remove `__pycache__` |
 
-A provider only needs to implement the commands that make sense for its
-language.
+A provider only needs to implement the commands that make sense for its language.
 
 ## Project detection
 
-Providers are matched by buffer. The first provider whose `detect` function
+Providers are detected by buffer. The first provider whose `detect` function
 returns `true` handles the task:
 
-- **Python** — `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`
-- **Java** — `pom.xml`, `build.gradle`, `settings.gradle`, `settings.gradle.kts`
-
-Add more markers to the `detect` function when extending a provider.
+| Language | Marker files |
+|----------|-------------|
+| Python | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile` |
+| Java | `pom.xml`, `build.gradle`, `settings.gradle`, `settings.gradle.kts` |
+| TypeScript | `package.json` |
+| Go | `go.mod` |
+| C/C++ | `CMakeLists.txt`, `Makefile`, `meson.build` |
+| Rust | `Cargo.toml` |
 
 ## Provider API
 
@@ -34,13 +36,14 @@ A task provider is a Lua table with a `detect` function and any number of task
 functions. Each task function receives the buffer number and returns either:
 
 - `nil` — the task is not supported or cannot run in this context.
-- a string or list of strings — the command to execute.
 - a table `{ cmd = ..., cwd = ... }` — the command and the working directory.
 
 ```lua
 local provider = {
   detect = function(bufnr)
-    return vim.fn.filereadable("go.mod") == 1
+    local path = vim.api.nvim_buf_get_name(bufnr)
+    local root = vim.fs.root(path, { "go.mod" })
+    return root ~= nil
   end,
 
   build = function(bufnr)
@@ -53,35 +56,38 @@ local provider = {
 
   run_file = function(bufnr)
     local file = vim.api.nvim_buf_get_name(bufnr)
-    if file == "" then
-      return nil
-    end
-    return { cmd = { "go", "run", file }, cwd = vim.fn.getcwd() }
+    if file == "" then return nil end
+    return { cmd = { "go", "run", file }, cwd = vim.fs.dirname(file) }
+  end,
+
+  run_project = function()
+    return { cmd = { "go", "run", "." }, cwd = vim.fn.getcwd() }
+  end,
+
+  clean = function()
+    return { cmd = { "go", "clean", "-cache" }, cwd = vim.fn.getcwd() }
   end,
 }
 ```
 
-## Adding a new task provider
+## Registering a new provider
 
 1. Create or open the language module under `lua/languages/<language>.lua`.
 2. Build a provider table following the API above.
-3. Register it with the task registry:
+3. Register it with the task system at the bottom of the file:
 
 ```lua
-require("features.tasks").register("go", provider)
+local ok, tasks = pcall(require, "util.tasks")
+if ok and tasks.register_provider then
+  tasks.register_provider("mylang", provider)
+end
 ```
 
-The generic `<leader>t` keymaps will now use the new provider for matching
-buffers. No changes to `lua/features/tasks.lua` are required.
+The `<leader>m` keymaps will now dispatch to the new provider for matching buffers.
 
-## Terminal separation
+## Fallback
 
-Task logic never manages terminal windows. When a task produces a command,
-`lua/features/tasks.lua` forwards it to `lua/features/terminal.lua`. Each task
-type is routed to a dedicated terminal:
-
-- `build` → `build`
-- `test` → `test`
-- `run_file` / `run_project` / `clean` → `shell`
-
-This keeps terminal lifecycle concerns out of language adapters.
+When no provider matches the current buffer, the task system looks for a
+`justfile` / `Justfile` or `Makefile` / `makefile` in the project root and runs
+`just <task>` or `make <task>` respectively. If neither is found, a warning is
+shown.

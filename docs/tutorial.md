@@ -184,8 +184,8 @@ Practice these — they are the backbone of every later section:
 
 | Key | Mode | Action |
 |-----|------|--------|
-| `<leader>e` | n | Open file explorer (oil.nvim) at the current file's directory |
-| `<leader>E` | n | Open explorer at the working directory |
+| `<leader>E` | n | Open file explorer (oil.nvim) at the current file's directory |
+| `<leader>O` | n | Open explorer at the working directory |
 | `<leader>ff` | n | Find files (fzf-lua) |
 | `<leader>fr` | n | Recent files |
 | `<leader><space>` | n | Switch buffers |
@@ -221,7 +221,7 @@ Treesitter text objects (usable with any operator, e.g. `daf` = delete around fu
 
 Discoverability: press `<leader>` alone and pause — `which-key` shows every group
 (`<leader>e`, `<leader>f`, `<leader>s`, `<leader>g`, `<leader>l`, `<leader>p`,
-`<leader>j`, `<leader>d`, `<leader>t`, `<leader>T`, `<leader>W`). You rarely need
+`<leader>j`, `<leader>d`, `<leader>m`, `<leader>T`, `<leader>W`). You rarely need
 to memorize anything.
 
 Shared LSP keys (work in both Python and Java once a server has attached):
@@ -408,14 +408,14 @@ Try it:
 3. Press `<leader>ptp` — the full project test suite runs.
 4. Open `src/calc.py` and press `<leader>pr` to run the module.
 
-There is also a generic task layer under `<leader>t` that dispatches to the Python
+There is also a generic task layer under `<leader>m` that dispatches to the Python
 provider automatically:
 
 | Key | Action |
 |-----|--------|
-| `<leader>tr` | Run the current file |
-| `<leader>ts` | Run tests for the current project |
-| `<leader>tc` | Clean build artifacts (removes all `__pycache__` dirs) |
+| `<leader>ms` | Run tests for the current project |
+| `<leader>mc` | Clean build artifacts (removes all `__pycache__` dirs) |
+| `<leader>mp` | Run the current project as a module |
 
 No test-UI plugin is used; output goes to a split terminal buffer.
 
@@ -710,11 +710,11 @@ Use the generic task provider (`<leader>t` group) or run directly:
 
 | Action | Command / Key |
 |--------|-------------|
-| Run current file | `:node %` (or `<leader>tr` — dispatches to `node <file>`) |
-| Build project | `<leader>tb` → `npm run build` |
-| Run tests | `<leader>ts` → `npm test` |
-| Start project | `<leader>tp` → `npm start` |
-| Clean | `<leader>tc` → removes `node_modules/`, `dist/`, `build/` |
+| Run current file | `:node %` or the terminal (`<leader>t`) |
+| Build project | `<leader>mb` → `npm run build` |
+| Run tests | `<leader>ms` → `npm test` |
+| Start project | `<leader>mp` → `npm start` |
+| Clean | `<leader>mc` → removes `node_modules/`, `dist/`, `build/` |
 
 ### 3b.6 Navigate and refactor
 
@@ -802,11 +802,10 @@ func TestDivideByZero(t *testing.T) {
 
 | Action | Key |
 |--------|-----|
-| Run current file | `<leader>tr` → `go run <file>` |
-| Build project | `<leader>tb` → `go build ./...` |
-| Run tests | `<leader>ts` → `go test ./...` |
-| Run project | `<leader>tp` → `go run .` |
-| Clean cache | `<leader>tc` → `go clean -cache` |
+| Build project | `<leader>mb` → `go build ./...` |
+| Run tests | `<leader>ms` → `go test ./...` |
+| Run project | `<leader>mp` → `go run .` |
+| Clean cache | `<leader>mc` → `go clean -cache` |
 | Organize imports manually | `<leader>lI` (in Go buffers) |
 
 ### 3c.5 Navigate
@@ -915,9 +914,9 @@ Or from inside Neovim via the task provider:
 
 | Action | Key |
 |--------|-----|
-| Build project | `<leader>tb` → `cmake --build build` |
-| Run tests | `<leader>ts` → `ctest --output-on-failure` |
-| Clean | `<leader>tc` → `rm -rf build` |
+| Build project | `<leader>mb` → `cmake --build build` |
+| Run tests | `<leader>ms` → `ctest --output-on-failure` |
+| Clean | `<leader>mc` → `rm -rf build` |
 
 ### 3d.5 Format
 
@@ -1008,10 +1007,10 @@ parameter types and names inline. Clippy warnings appear as diagnostics.
 
 | Action | Key |
 |--------|-----|
-| Build project | `<leader>tb` → `cargo build` |
-| Run tests | `<leader>ts` → `cargo test` |
-| Run project | `<leader>tp` → `cargo run` |
-| Clean | `<leader>tc` → `cargo clean` |
+| Build project | `<leader>mb` → `cargo build` |
+| Run tests | `<leader>ms` → `cargo test` |
+| Run project | `<leader>mp` → `cargo run` |
+| Clean | `<leader>mc` → `cargo clean` |
 
 ### 3e.6 Navigate
 
@@ -1128,12 +1127,11 @@ A complete session:
 
 That's the entire round-trip without ever opening a separate terminal.
 
-### 4.5 Dedicated Git terminal (optional)
+### 4.5 Floating terminal (optional)
 
-`<leader>tg` opens a dedicated, reusable vertical "Git" terminal via
-`toggleterm.nvim` for raw `git` commands. It is reused, never duplicated. (Other
-terminals: `<leader>tt` horizontal, `<leader>tf` floating, `<leader>ta` Agent
-floating.)
+`<leader>t` opens a floating terminal via `toggleterm.nvim` for raw `git`
+commands or any other shell work. Toggle it again to hide it — it persists
+between toggles.
 
 ---
 

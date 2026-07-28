@@ -44,7 +44,13 @@ return {
   "akinsho/toggleterm.nvim",
   version = "*",
   keys = {
-    { "<leader>t", function() M.toggle() end, desc = "Toggle floating terminal" },
+    {
+      "<leader>t",
+      function()
+        M.toggle()
+      end,
+      desc = "Toggle floating terminal",
+    },
   },
   config = function()
     require("toggleterm").setup({

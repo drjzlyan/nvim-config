@@ -30,10 +30,34 @@ return {
         { "<leader>:", desc = "Command history" },
         { "<leader><space>", desc = "Buffers" },
         { "<leader>st", desc = "Search TODOs" },
-        { "<leader>mb", function() require("util.tasks").build() end, desc = "Run build task" },
-        { "<leader>ms", function() require("util.tasks").test() end, desc = "Run test task" },
-        { "<leader>mc", function() require("util.tasks").clean() end, desc = "Run clean task" },
-        { "<leader>mp", function() require("util.tasks").run_project() end, desc = "Run project task" },
+        {
+          "<leader>mb",
+          function()
+            require("util.tasks").build()
+          end,
+          desc = "Run build task",
+        },
+        {
+          "<leader>ms",
+          function()
+            require("util.tasks").test()
+          end,
+          desc = "Run test task",
+        },
+        {
+          "<leader>mc",
+          function()
+            require("util.tasks").clean()
+          end,
+          desc = "Run clean task",
+        },
+        {
+          "<leader>mp",
+          function()
+            require("util.tasks").run_project()
+          end,
+          desc = "Run project task",
+        },
         { "<leader>ee", desc = "Diagnostics (Trouble)" },
         { "<leader>er", desc = "LSP references (Trouble)" },
         { "<leader>ei", desc = "LSP implementations (Trouble)" },
@@ -59,18 +83,90 @@ return {
         { "<leader>du", desc = "Toggle UI" },
         { "<leader>dt", desc = "Terminate" },
         { "<leader>dx", desc = "Clear breakpoints" },
-        { "<leader>Tt", function() require("util.testing").run_nearest() end, desc = "Run nearest test" },
-        { "<leader>Tc", function() require("util.testing").run_current_class() end, desc = "Run test class" },
-        { "<leader>Tp", function() require("util.testing").run_package() end, desc = "Run package tests" },
-        { "<leader>Tm", function() require("util.testing").run_module() end, desc = "Run module tests" },
-        { "<leader>Tl", function() require("util.testing").rerun_last() end, desc = "Re-run last test" },
-        { "<leader>Td", function() require("util.testing").debug_nearest() end, desc = "Debug nearest test" },
-        { "<leader>TD", function() require("util.testing").debug_current_class() end, desc = "Debug test class" },
-        { "<leader>Wb", function() require("languages.java-commands").build_workspace() end, desc = "Build workspace" },
-        { "<leader>Wr", function() require("languages.java-commands").reload_workspace() end, desc = "Reload workspace" },
-        { "<leader>Ww", function() require("languages.java-commands").restart_jdtls() end, desc = "Restart jdtls" },
-        { "<leader>Wc", function() require("languages.java-commands").clear_workspace_cache() end, desc = "Clear workspace cache" },
-        { "<leader>Wl", function() require("languages.java-commands").open_workspace_logs() end, desc = "Open workspace logs" },
+        {
+          "<leader>Tt",
+          function()
+            require("util.testing").run_nearest()
+          end,
+          desc = "Run nearest test",
+        },
+        {
+          "<leader>Tc",
+          function()
+            require("util.testing").run_current_class()
+          end,
+          desc = "Run test class",
+        },
+        {
+          "<leader>Tp",
+          function()
+            require("util.testing").run_package()
+          end,
+          desc = "Run package tests",
+        },
+        {
+          "<leader>Tm",
+          function()
+            require("util.testing").run_module()
+          end,
+          desc = "Run module tests",
+        },
+        {
+          "<leader>Tl",
+          function()
+            require("util.testing").rerun_last()
+          end,
+          desc = "Re-run last test",
+        },
+        {
+          "<leader>Td",
+          function()
+            require("util.testing").debug_nearest()
+          end,
+          desc = "Debug nearest test",
+        },
+        {
+          "<leader>TD",
+          function()
+            require("util.testing").debug_current_class()
+          end,
+          desc = "Debug test class",
+        },
+        {
+          "<leader>Wb",
+          function()
+            require("languages.java-commands").build_workspace()
+          end,
+          desc = "Build workspace",
+        },
+        {
+          "<leader>Wr",
+          function()
+            require("languages.java-commands").reload_workspace()
+          end,
+          desc = "Reload workspace",
+        },
+        {
+          "<leader>Ww",
+          function()
+            require("languages.java-commands").restart_jdtls()
+          end,
+          desc = "Restart jdtls",
+        },
+        {
+          "<leader>Wc",
+          function()
+            require("languages.java-commands").clear_workspace_cache()
+          end,
+          desc = "Clear workspace cache",
+        },
+        {
+          "<leader>Wl",
+          function()
+            require("languages.java-commands").open_workspace_logs()
+          end,
+          desc = "Open workspace logs",
+        },
         { "<leader>jf", desc = "Format Java", mode = { "n", "v" } },
         { "<leader>ji", desc = "Organize imports" },
         { "<leader>jr", desc = "Refactor", mode = { "n", "v" } },

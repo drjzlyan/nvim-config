@@ -2,9 +2,9 @@
 
 A hands-on, keystroke-by-keystroke walkthrough for the `dotfiles` + `nvim-config`
 development environment. Unlike the reference docs, this guide is sequenced: follow
-it top to bottom and you will have selected languages, edited, built, tested,
-debugged, and committed code in Python and Java, and managed a repository with
-lazygit.
+it top to bottom and you will have selected languages with versions, edited,
+built, tested, debugged, and committed code in Python, Java, TypeScript, Go,
+C/C++, and Rust, and managed a repository with lazygit.
 
 Prerequisites:
 
@@ -71,11 +71,11 @@ nvim
 On first launch `lazy.nvim` bootstraps itself, installs all plugins, and writes
 `lazy-lock.json`. Wait for the notifications to finish.
 
-### 1.3 Select programming languages
+### 1.3 Select programming languages and versions
 
 `install.sh` launches an interactive language selector after the editor config
-is linked. Choose the languages you want — the IDE and tool installer adapt
-automatically:
+is linked. Choose languages **and their runtime versions** — versions are
+queried dynamically from `mise ls-remote`, so you always see what's available:
 
 ```
   ╔═══════════════════════════════════════════════════════════╗
@@ -84,21 +84,44 @@ automatically:
   ║  Common languages are always available:                   ║
   ║    JSON, YAML, Bash, Lua, TOML, Markdown                  ║
   ╠═══════════════════════════════════════════════════════════╣
-  ║  Toggle languages by number. Press Enter when done.      ║
+  ║  Toggle languages by number. 'v' to change version.       ║
+  ║  Press Enter when done.                                    ║
   ╚═══════════════════════════════════════════════════════════╝
 
-  [✓] 1. python       Python — basedpyright, ruff, pytest, debugpy
-  [ ] 2. java        Java — jdtls, lombok, google-java-format, Maven/Gradle, JUnit
-  [ ] 3. typescript  TypeScript/JS — typescript-language-server, prettier
-  [ ] 4. go          Go — gopls, goimports, delve
-  [ ] 5. cpp         C/C++ — clangd, clang-format
-  [ ] 6. rust        Rust — rust-analyzer, rustfmt, cargo
+  [✓] 1. python        Python (3.12.7)
+  [✓] 2. java          Java (17)
+  [ ] 3. typescript    TypeScript/JS
+  [ ] 4. go            Go
+  [ ] 5. cpp           C/C++ (system)
+  [ ] 6. rust          Rust
+
+  Commands: number=toggle, v<number>=version, a=all, n=none, Enter=done
+```
+
+When you select a language, the selector fetches available versions from
+`mise ls-remote` and shows the most recent stable releases:
+
+```
+  Available Python versions (querying mise):
+  [*] 1. 3.12.7
+      2. 3.12.6
+      3. 3.11.10
+      4. 3.11.9
+      ...
+  Enter a number, type a version string, or Enter for default (3.12).
+```
+
+To change a version later, use `v<number>` in the menu:
+
+```
+ > v1          # change Python version
 ```
 
 Common languages (JSON, YAML, Bash, Lua, TOML, Markdown) are **always
 available** — you don't select them.
 
-To add or remove languages later (without re-running the full installer):
+To add or remove languages or change versions later (without re-running the
+full installer):
 
 ```bash
 ~/Development/dotfiles/scripts/languages.sh          # interactive menu
@@ -108,7 +131,24 @@ To add or remove languages later (without re-running the full installer):
 
 The selection is saved to `~/.local/share/nvim/languages.local` and is
 non-destructive — your existing settings are never modified. After changing
-the selection, restart Neovim and the new language modules load automatically.
+the selection, restart Neovim and your shell for the new language modules and
+runtime versions to take effect. The `mise.toml` file is generated automatically
+from your selection.
+
+The `languages.local` file uses a simple `key=value` format:
+
+```
+# Languages and versions configured for this machine.
+python=3.12.7
+java=17
+typescript=20.18.0
+go=1.23.3
+cpp=system
+rust=1.81.0
+```
+
+You can edit this file manually and re-run `mise install`, or use the
+interactive selector. Both approaches are non-destructive.
 
 See [`docs/languages.md`](languages.md) for the full list of tools and
 keymaps per language.
@@ -539,6 +579,394 @@ If imports or rename ever look stale, `<leader>Ww` to restart jdtls, or
 `<leader>Wc` to clear the cache.
 
 You have now built, navigated, refactored, tested, and debugged Java.
+
+---
+
+## Part 3b — TypeScript / JavaScript tutorial
+
+Goal: create a Node.js project, get LSP + formatting, run and build with the
+task provider — all inside the IDE.
+
+### 3b.1 Create the project
+
+```bash
+cd ~/ide-tutorial
+mkdir calc-ts && cd calc-ts
+npm init -y
+npm install --save-dev typescript @types/node
+npx tsc --init
+```
+
+### 3b.2 Write code
+
+```bash
+nvim src/calc.ts
+```
+
+```typescript
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new Error("b must not be zero");
+  }
+  return a / b;
+}
+```
+
+`typescript-language-server` attaches automatically when a `.ts` file opens
+(root detection: `tsconfig.json` or `package.json`).
+
+### 3b.3 Add a test
+
+```vim
+:e src/calc.test.ts
+```
+
+```typescript
+import { add, divide } from "./calc";
+
+test("add", () => {
+  expect(add(2, 3)).toBe(5);
+});
+
+test("divide by zero", () => {
+  expect(() => divide(1, 0)).toThrow("b must not be zero");
+});
+```
+
+### 3b.4 Save and format
+
+Write with `:w`. Format on save runs `prettier` for `.ts`, `.tsx`, `.js`, `.jsx`
+files. Manual format: `<leader>lf`.
+
+### 3b.5 Run and build
+
+Use the generic task provider (`<leader>t` group) or run directly:
+
+| Action | Command / Key |
+|--------|-------------|
+| Run current file | `:node %` (or `<leader>tr` — dispatches to `node <file>`) |
+| Build project | `<leader>tb` → `npm run build` |
+| Run tests | `<leader>ts` → `npm test` |
+| Start project | `<leader>tp` → `npm start` |
+| Clean | `<leader>tc` → removes `node_modules/`, `dist/`, `build/` |
+
+### 3b.6 Navigate and refactor
+
+Use the shared LSP keys: `gd` (definition), `gr` (references), `gi`
+(implementation), `K` (hover), `<leader>la` (code action), `<leader>lr`
+(rename). These work identically to Python and Java.
+
+### 3b.7 tmux workflow
+
+Start a `dev` session for a TypeScript project:
+
+```bash
+dev calc-ts
+```
+
+This opens a 3-pane layout (nvim | agent / build-test) plus a lazygit window.
+Run `npm run build` in the bottom-right pane, jump there with `Ctrl-a j`,
+jump back to nvim with `Ctrl-a h` (vi-style tmux navigation).
+
+You have now built and tested TypeScript.
+
+---
+
+## Part 3c — Go tutorial
+
+Goal: create a Go module, get `gopls` + format-on-save, run and test with the
+task provider, and use the tmux dev session.
+
+### 3c.1 Create the module
+
+```bash
+cd ~/ide-tutorial
+mkdir calc-go && cd calc-go
+go mod init example.com/calc
+```
+
+### 3c.2 Write code
+
+```bash
+nvim calc.go
+```
+
+```go
+package calc
+
+func Add(a, b int) int {
+	return a + b
+}
+
+func Divide(a, b int) float64 {
+	if b == 0 {
+		panic("b must not be zero")
+	}
+	return float64(a) / float64(b)
+}
+```
+
+`gopls` attaches on `FileType go` (root detection: `go.mod` or `go.work`).
+Save with `:w` — `goimports` organizes imports, then `gofmt` formats the buffer.
+
+### 3c.3 Add a test
+
+```vim
+:e calc_test.go
+```
+
+```go
+package calc
+
+import "testing"
+
+func TestAdd(t *testing.T) {
+	if got := Add(2, 3); got != 5 {
+		t.Errorf("Add(2, 3) = %v, want 5", got)
+	}
+}
+
+func TestDivideByZero(t *testing.T) {
+	defer func() { _ = recover() }()
+	Divide(1, 0)
+}
+```
+
+### 3c.4 Run and test
+
+| Action | Key |
+|--------|-----|
+| Run current file | `<leader>tr` → `go run <file>` |
+| Build project | `<leader>tb` → `go build ./...` |
+| Run tests | `<leader>ts` → `go test ./...` |
+| Run project | `<leader>tp` → `go run .` |
+| Clean cache | `<leader>tc` → `go clean -cache` |
+| Organize imports manually | `<leader>lI` (in Go buffers) |
+
+### 3c.5 Navigate
+
+`gopls` provides `gd`, `gr`, `gi`, `gt`, `K`, `<leader>la`, `<leader>lr` —
+the same shared LSP keys. Staticcheck and nilness analyses are enabled
+automatically.
+
+### 3c.6 tmux workflow
+
+```bash
+dev calc-go
+```
+
+Run `go test ./...` in the build/test pane (`Ctrl-a j`), review failures, fix
+in nvim (`Ctrl-a h`), re-run. Use `Ctrl-a g` to open lazygit for committing.
+
+You have now built and tested Go.
+
+---
+
+## Part 3d — C / C++ tutorial
+
+Goal: create a CMake project, get `clangd` with clang-tidy, build with CMake,
+and format with clang-format.
+
+### 3d.1 Create the project
+
+```bash
+cd ~/ide-tutorial
+mkdir calc-cpp && cd calc-cpp
+mkdir build
+```
+
+Create `CMakeLists.txt`:
+
+```bash
+nvim CMakeLists.txt
+```
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+project(calc CXX)
+set(CMAKE_CXX_STANDARD 17)
+
+enable_testing()
+
+add_executable(calc src/calc.cpp src/calc_test.cpp)
+target_include_directories(calc PRIVATE src)
+add_test(NAME calc_test COMMAND calc)
+```
+
+### 3d.2 Write code
+
+```bash
+nvim src/calc.cpp
+```
+
+```cpp
+#pragma once
+
+int add(int a, int b);
+double divide(int a, int b);
+```
+
+```vim
+:e src/calc.cpp
+```
+
+```cpp
+#include "calc.hpp"
+
+int add(int a, int b) {
+    return a + b;
+}
+
+double divide(int a, int b) {
+    if (b == 0) {
+        throw std::invalid_argument("b must not be zero");
+    }
+    return static_cast<double>(a) / b;
+}
+```
+
+`clangd` attaches on `FileType c`/`cpp` (root detection:
+`compile_commands.json` or `CMakeLists.txt`). It uses background indexing,
+clang-tidy, and header insertion (iwyu style).
+
+### 3d.3 Generate compile_commands.json
+
+```bash
+cd build
+cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
+```
+
+Restart Neovim or reopen the file — `clangd` picks up
+`compile_commands.json` and provides accurate diagnostics.
+
+### 3d.4 Build and test
+
+```bash
+cd build && cmake --build . && ctest --output-on-failure
+```
+
+Or from inside Neovim via the task provider:
+
+| Action | Key |
+|--------|-----|
+| Build project | `<leader>tb` → `cmake --build build` |
+| Run tests | `<leader>ts` → `ctest --output-on-failure` |
+| Clean | `<leader>tc` → `rm -rf build` |
+
+### 3d.5 Format
+
+Save with `:w` — `clang-format` formats automatically. Manual format:
+`<leader>lf`. The fallback style is LLVM.
+
+### 3d.6 Navigate
+
+`clangd` provides `gd`, `gr`, `gi`, `gt`, `K`, `<leader>la`, `<leader>lr`.
+Completion shows function argument placeholders.
+
+You have now built and tested C/C++.
+
+---
+
+## Part 3e — Rust tutorial
+
+Goal: create a Cargo project, get `rust-analyzer` with clippy + inlay hints,
+build, test, and run with the task provider.
+
+### 3e.1 Create the project
+
+```bash
+cd ~/ide-tutorial
+cargo new calc-rs
+cd calc-rs
+```
+
+### 3e.2 Write code
+
+```bash
+nvim src/main.rs
+```
+
+```rust
+pub fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+pub fn divide(a: i32, b: i32) -> f64 {
+    if b == 0 {
+        panic!("b must not be zero");
+    }
+    a as f64 / b as f64
+}
+
+fn main() {
+    println!("{}", add(2, 3));
+}
+```
+
+`rust-analyzer` attaches on `FileType rust` (root detection: `Cargo.toml`).
+It enables all cargo features, clippy on save, proc macro support, and inlay
+hints (type hints, parameter hints, chaining hints).
+
+### 3e.3 Add a test
+
+```vim
+:e src/lib.rs
+```
+
+Actually, put tests in the same file:
+
+```rust
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        assert_eq!(add(2, 3), 5);
+    }
+
+    #[test]
+    #[should_panic(expected = "b must not be zero")]
+    fn test_divide_by_zero() {
+        divide(1, 0);
+    }
+}
+```
+
+### 3e.4 Save and format
+
+Save with `:w` — `rustfmt` formats via `rust-analyzer`. Inlay hints show
+parameter types and names inline. Clippy warnings appear as diagnostics.
+
+### 3e.5 Build, test, and run
+
+| Action | Key |
+|--------|-----|
+| Build project | `<leader>tb` → `cargo build` |
+| Run tests | `<leader>ts` → `cargo test` |
+| Run project | `<leader>tp` → `cargo run` |
+| Clean | `<leader>tc` → `cargo clean` |
+
+### 3e.6 Navigate
+
+`rust-analyzer` provides `gd`, `gr`, `gi`, `gt`, `K`, `<leader>la`,
+`<leader>lr` — the same shared LSP keys. Macro expansions are decoded so
+you can navigate into generated code.
+
+### 3e.7 tmux workflow
+
+```bash
+dev calc-rs
+```
+
+Run `cargo test` in the build/test pane, iterate in nvim, commit via
+`Ctrl-a g` (lazygit window).
+
+You have now built and tested Rust.
 
 ---
 

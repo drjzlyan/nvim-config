@@ -6,11 +6,13 @@
 -- and never committed to the repository:
 --   ~/.local/share/nvim/languages.local
 --
--- Format: one language per line, comments start with #.  Example:
---   python
---   java
---   typescript
---   go
+-- Format: key=value, one per line, comments start with #.  Example:
+--   python=3.12.7
+--   java=17
+--   typescript=20.18.0
+--   go=1.23.3
+--   cpp=system
+--   rust=1.81.0
 
 local M = {}
 
@@ -42,11 +44,35 @@ function M.selected()
   for line in f:lines() do
     line = line:gsub("#.*", ""):gsub("^%s+", ""):gsub("%s+$", "")
     if line ~= "" then
-      table.insert(langs, line)
+      -- Extract the language name from key=value format
+      local lang = line:match("^([%a]+)=")
+      if lang then
+        table.insert(langs, lang)
+      end
     end
   end
   f:close()
   return langs
+end
+
+--- Read the version for a selected language.
+---@param lang string
+---@return string|nil
+function M.version(lang)
+  local f = io.open(M.config_path, "r")
+  if not f then
+    return nil
+  end
+  for line in f:lines() do
+    line = line:gsub("#.*", ""):gsub("^%s+", ""):gsub("%s+$", "")
+    local l, v = line:match("^([%a]+)=(.+)$")
+    if l == lang then
+      f:close()
+      return v
+    end
+  end
+  f:close()
+  return nil
 end
 
 --- Check whether a language is selected.

@@ -4,14 +4,14 @@ return {
     cmd = "Oil",
     keys = {
       {
-        "<leader>e",
+        "<leader>E",
         function()
           require("oil").open()
         end,
         desc = "Open oil (file dir)",
       },
       {
-        "<leader>E",
+        "<leader>O",
         function()
           require("oil").open(vim.fn.getcwd())
         end,

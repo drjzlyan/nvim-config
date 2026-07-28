@@ -348,7 +348,7 @@ brew install lua-language-server vscode-json-languageserver yaml-language-server
 ## Installation
 
 ```bash
-git clone https://github.com/example/nvim-config.git ~/.config/nvim
+git clone git@github.com:drjzlyan/nvim-config.git ~/.config/nvim
 nvim
 ```
 
@@ -366,6 +366,7 @@ The `lazy-lock.json` is committed for reproducibility.
 
 ## Documentation
 
+- [`docs/tutorial.md`](docs/tutorial.md) — hands-on walkthrough: IDE setup, Python, Java, and lazygit
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/installation.md`](docs/installation.md)
 - [`docs/plugins.md`](docs/plugins.md)

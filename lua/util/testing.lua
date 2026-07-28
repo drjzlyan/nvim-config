@@ -78,16 +78,4 @@ function M.rerun_last()
   end
 end
 
-return {
-  "akinsho/toggleterm.nvim",
-  register = M.register,
-  detect = M.detect,
-  providers = M.providers,
-  run_nearest = M.run_nearest,
-  run_current_class = M.run_current_class,
-  run_package = M.run_package,
-  run_module = M.run_module,
-  rerun_last = M.rerun_last,
-  debug_nearest = M.debug_nearest,
-  debug_current_class = M.debug_current_class,
-}
+return M

@@ -505,11 +505,6 @@ local python_provider = {
   end,
 }
 
-local ok, tasks = pcall(require, "features.tasks")
-if ok then
-  tasks.register("python", python_provider)
-end
-
 -- This module is loaded by lazy.nvim's `import = "languages"` mechanism.
 -- It does not need to return a plugin spec, but returning an empty table keeps
 -- the import convention consistent with lua/languages/init.lua.

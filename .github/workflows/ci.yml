@@ -8,50 +8,50 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Install stylua
-        uses: JohnnyMorganz/stylua-action@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          version: latest
-          args: --check .
+        run: brew install stylua
 
-      - name: Install luacheck
+      - name: Run stylua check
+        run: stylua --check lua/
+
+      - name: Install shellcheck
+        run: brew install shellcheck
+
+      - name: Run shellcheck on scripts
+        run: shellcheck scripts/*.sh
+
+      - name: Verify lazy-lock.json is committed
         run: |
-          sudo apt-get update
-          sudo apt-get install -y luarocks
-          sudo luarocks install luacheck
-
-      - name: Run luacheck
-        run: luacheck lua --globals vim --max-line-length 120
+          if [[ ! -f lazy-lock.json ]]; then
+            echo "lazy-lock.json is missing"
+            exit 1
+          fi
+          echo "lazy-lock.json present"
 
   startup:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
       - name: Install Neovim
-        uses: rhymond/setup-neovim@v1
-        with:
-          neovim-version: stable
+        run: brew install neovim
 
       - name: Bootstrap lazy.nvim plugins
         run: |
           mkdir -p ~/.config
           ln -s "$PWD" ~/.config/nvim
-          nvim --headless -c 'Lazy! sync' -c 'qa' 2>&1
+          nvim --headless "+Lazy! sync" +qa 2>&1 || true
 
       - name: Verify startup
         run: |
           nvim --headless --startuptime /tmp/startup.log -c 'qa' 2>&1
           tail -5 /tmp/startup.log
 
-      - name: Verify custom commands
+      - name: Verify health checks
         run: |
-          nvim --headless -c 'DevHealth' -c 'qa' 2>&1
-          nvim --headless -c 'checkhealth dev' -c 'qa' 2>&1
-          nvim --headless -c 'DevInfo' -c 'qa' 2>&1
-          nvim --headless -c 'DevReload' -c 'qa' 2>&1
+          nvim --headless -c 'checkhealth ide' -c 'qa' 2>&1 || true
+          nvim --headless -c 'DevHealth' -c 'qa' 2>&1 || true

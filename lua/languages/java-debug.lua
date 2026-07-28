@@ -2,7 +2,12 @@ local M = {}
 
 local function find_bundles()
   local bundles = {}
+  local home = vim.fn.expand("~")
   local candidates = {
+    home .. "/.local/share/ide-tools/java-debug/extensions/debug/*.jar",
+    home .. "/.local/share/ide-tools/java-debug/server/*.jar",
+    home .. "/.local/share/ide-tools/java-test/extensions/*.jar",
+    home .. "/.local/share/ide-tools/java-test/server/*.jar",
     "/opt/homebrew/opt/java-debug-adapter/libexec/extensions/debug/*.jar",
     "/opt/homebrew/opt/java-test/libexec/extensions/*.jar",
     "/usr/local/opt/java-debug-adapter/libexec/extensions/debug/*.jar",

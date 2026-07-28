@@ -3,7 +3,6 @@ return {
     "mfussenegger/nvim-dap",
     dependencies = {
       "rcarriga/nvim-dap-ui",
-      "theHamsta/nvim-dap-virtual-text",
       "nvim-neotest/nvim-nio",
       "mfussenegger/nvim-jdtls",
     },
@@ -99,17 +98,6 @@ return {
       vim.fn.sign_define("DapStopped", { text = "→", texthl = "DapStopped", linehl = "DapStopped" })
 
       dapui.setup()
-
-      require("nvim-dap-virtual-text").setup({
-        enabled = true,
-        enabled_commands = false,
-        commented = false,
-        highlight_changed_variables = true,
-        highlight_new_as_changed = false,
-        show_stop_reason = true,
-        only_first_definition = true,
-        all_references = false,
-      })
 
       dap.listeners.after.event_initialized["dapui_config"] = function()
         dapui.open()

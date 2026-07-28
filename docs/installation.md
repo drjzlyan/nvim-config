@@ -10,7 +10,7 @@
 ## Bootstrap
 
 ```bash
-git clone https://github.com/example/nvim-config.git ~/.config/nvim
+git clone git@github.com:drjzlyan/nvim-config.git ~/.config/nvim
 nvim
 ```
 

@@ -18,6 +18,8 @@ require("lazy").setup({
     { import = "features" },
     { import = "languages.python" },
     { import = "languages.java" },
+    { import = "ide.features" },
+    { import = "ide.languages" },
   },
   defaults = {
     lazy = true,

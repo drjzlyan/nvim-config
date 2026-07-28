@@ -24,3 +24,21 @@ local undo_dir = vim.fn.stdpath("state") .. "/undo"
 if vim.fn.isdirectory(undo_dir) == 0 then
   vim.fn.mkdir(undo_dir, "p")
 end
+
+-- Bigfile handling: disable expensive features for large files
+local bigfile_group = augroup("Bigfile", { clear = true })
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+  group = bigfile_group,
+  callback = function(args)
+    local ok, stats = pcall(vim.uv.fs_stat, args.file)
+    if not ok or not stats then
+      return
+    end
+    if stats.size > 1024 * 1024 then
+      vim.b[args.buf].bigfile = true
+      vim.opt_local.swapfile = false
+      vim.opt_local.undofile = false
+      vim.opt_local.bufhidden = "wipe"
+    end
+  end,
+})

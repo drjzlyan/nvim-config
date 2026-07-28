@@ -182,7 +182,7 @@ function M.register_keymaps(bufnr)
     vim.keymap.set(modes, keys, fn, { buffer = bufnr, silent = true, desc = desc })
   end
 
-  local testing = require("features.testing")
+  local testing = require("util.testing")
 
   map("<leader>jf", M.format_java, { "n", "v" }, "Format Java")
   map("<leader>ji", source_action("source.organizeImports"), "n", "Organize imports")

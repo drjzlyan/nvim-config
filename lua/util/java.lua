@@ -2,21 +2,28 @@ local M = {}
 
 local function find_jdks()
   local jdks = {}
+  local home = vim.fn.expand("~")
   local brew_prefix = vim.fn.exists("$HOMEBREW_PREFIX") == 1 and vim.env.HOMEBREW_PREFIX
     or (vim.fn.isdirectory("/opt/homebrew") == 1 and "/opt/homebrew" or "/usr/local")
 
   local bases = {
     [8] = {
+      home .. "/.local/share/mise/installs/java/8",
+      home .. "/.local/share/mise/installs/java/temurin-8",
       brew_prefix .. "/opt/openjdk@8/libexec/openjdk.jdk/Contents/Home",
       "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home",
       "/usr/local/opt/openjdk@8/libexec/openjdk.jdk/Contents/Home",
     },
     [11] = {
+      home .. "/.local/share/mise/installs/java/11",
+      home .. "/.local/share/mise/installs/java/temurin-11",
       brew_prefix .. "/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home",
       "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",
       "/usr/local/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home",
     },
     [17] = {
+      home .. "/.local/share/mise/installs/java/17",
+      home .. "/.local/share/mise/installs/java/temurin-17",
       brew_prefix .. "/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home",
       "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home",
       "/usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home",
@@ -67,10 +74,12 @@ function M.pick_jdk_for_project(root)
 end
 
 function M.find_lombok_jar()
+  local home = vim.fn.expand("~")
   local brew_prefix = vim.fn.exists("$HOMEBREW_PREFIX") == 1 and vim.env.HOMEBREW_PREFIX
     or (vim.fn.isdirectory("/opt/homebrew") == 1 and "/opt/homebrew" or "/usr/local")
 
   local candidates = {
+    home .. "/.local/share/ide-tools/lombok.jar",
     brew_prefix .. "/opt/lombok/libexec/lombok.jar",
     brew_prefix .. "/opt/lombok/libexec/lombok-1.18.34.jar",
     "/usr/local/opt/lombok/libexec/lombok.jar",

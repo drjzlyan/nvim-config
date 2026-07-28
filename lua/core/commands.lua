@@ -67,6 +67,7 @@ local function dev_reload()
       or name:match("^features%.")
       or name:match("^languages%.")
       or name:match("^util%.")
+      or name:match("^ide%.")
       or name == "dev.health"
     then
       package.loaded[name] = nil

@@ -125,12 +125,7 @@ local java_provider = {
   end,
 }
 
-local ok, tasks = pcall(require, "features.tasks")
-if ok then
-  tasks.register("java", java_provider)
-end
-
-local testing = require("features.testing")
+local testing = require("util.testing")
 if testing then
   testing.register("java", java_testing)
 end

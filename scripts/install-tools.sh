@@ -7,6 +7,7 @@ BIN_DIR="$TOOLS_DIR/bin"
 
 mkdir -p "$TOOLS_DIR" "$BIN_DIR"
 
+# shellcheck source=/dev/null
 source "$SCRIPT_DIR/tools.lock"
 
 log() {

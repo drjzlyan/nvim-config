@@ -5,7 +5,7 @@
 --   clangd        — language server (brew install clangd or llvm)
 --   clang-format  — formatter      (comes with clangd/llvm)
 
-local lsp_lib = require("ide.lib.lsp")
+local lsp_lib = require("util.lsp")
 
 local M = {}
 

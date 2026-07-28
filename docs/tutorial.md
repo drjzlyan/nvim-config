@@ -21,6 +21,292 @@ Conventions used below:
 
 ---
 
+## Part 0 — Fundamentals: Neovim and tmux
+
+Skip this part if you are already comfortable with Neovim and tmux. If either is
+new to you, work through this before touching the language sections — these
+movements appear constantly in the rest of the tutorial.
+
+### 0.1 tmux basics
+
+tmux is a terminal multiplexer: it runs multiple shells in one window, lets you
+switch between them instantly, and keeps sessions alive after you close the
+terminal.
+
+**Prefix key**: `Ctrl-a` (the dotfiles config changes the default `Ctrl-b`).
+Every tmux command starts with the prefix.
+
+#### Sessions, windows, panes
+
+| Concept | What it is |
+|---------|-----------|
+| Session | A named group of windows. `dev` creates one per project. |
+| Window | A tab inside a session. Each window fills the whole terminal. |
+| Pane | A split inside a window. The `dev` session opens 2 panes by default. |
+
+#### Session management
+
+| Key / Command | Action |
+|---------------|--------|
+| `Ctrl-a d` | Detach from session (session keeps running) |
+| `Ctrl-a s` | Interactive session switcher |
+| `Ctrl-a $` | Rename current session |
+| `Ctrl-a Q` | Kill the current session (dotfiles binding) |
+| `tmux ls` | List sessions from the shell |
+| `tmux attach -t <name>` | Reattach to a detached session |
+
+#### Window management
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-a c` | Create a new window |
+| `Ctrl-a n` | Next window |
+| `Ctrl-a p` | Previous window |
+| `Ctrl-a 1`–`9` | Jump to window by number |
+| `Ctrl-a ,` | Rename current window |
+| `Ctrl-a &` | Close current window (confirm) |
+| `Ctrl-a g` | Open lazygit in a new window (dotfiles binding) |
+| `Ctrl-a P` | Start a new project session (dotfiles binding) |
+
+#### Pane navigation and management
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-a h` | Move to pane on the left |
+| `Ctrl-a j` | Move to pane below |
+| `Ctrl-a k` | Move to pane above |
+| `Ctrl-a l` | Move to pane on the right |
+| `Ctrl-a \|` | Split current pane right |
+| `Ctrl-a -` | Split current pane below |
+| `Ctrl-a z` | Zoom (toggle fullscreen) for current pane |
+| `Ctrl-a x` | Close current pane (confirm) |
+| `Ctrl-a !` | Break pane out into its own window |
+| `Ctrl-a {` / `Ctrl-a }` | Swap pane left / right |
+| `Ctrl-a H/J/K/L` | Resize pane (hold and repeat) |
+
+#### Copy mode (scroll the terminal)
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-a [` | Enter copy mode (scroll with arrow keys or `j`/`k`) |
+| `v` | (in copy mode) Start selection |
+| `y` | (in copy mode) Copy selection |
+| `q` | Exit copy mode |
+
+Other useful bindings:
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-a r` | Reload tmux config |
+| `Ctrl-a :` | Open tmux command prompt |
+
+---
+
+### 0.2 Neovim modes
+
+Neovim is modal: what a key does depends on which mode you are in.
+
+| Mode | How to enter | What it does |
+|------|-------------|--------------|
+| **Normal** | `Esc` (or `jk` in insert) | Navigation and commands — the default |
+| **Insert** | `i`, `a`, `o`, `O`, `s`, `c…` | Type text |
+| **Visual** | `v` | Select characters |
+| **Visual-Line** | `V` | Select whole lines |
+| **Visual-Block** | `Ctrl-v` | Select a rectangular block |
+| **Command** | `:` | Enter Ex commands (`:w`, `:q`, `:help`, …) |
+
+Quick mode transitions:
+
+```
+Normal  →  Insert:    i  (before cursor)   a  (after cursor)
+Normal  →  Insert:    o  (new line below)  O  (new line above)
+Normal  →  Visual:    v  (char)  V  (line)  Ctrl-v  (block)
+Insert  →  Normal:    Esc  (or jk — dotfiles maps this)
+```
+
+---
+
+### 0.3 Neovim movement
+
+All movement commands work in Normal mode.
+
+#### Character and line
+
+| Key | Action |
+|-----|--------|
+| `h` / `l` | Left / right one character |
+| `j` / `k` | Down / up one line |
+| `0` | Start of line (including whitespace) |
+| `^` | First non-blank character of line |
+| `$` | End of line |
+| `gg` | First line of file |
+| `G` | Last line of file |
+| `:<n>` or `<n>G` | Jump to line `n` |
+
+#### Word movement
+
+| Key | Action |
+|-----|--------|
+| `w` | Next word start (punctuation is a boundary) |
+| `W` | Next WORD start (whitespace only is a boundary) |
+| `b` | Previous word start |
+| `B` | Previous WORD start |
+| `e` | Next word end |
+| `E` | Next WORD end |
+
+#### In-line jumps
+
+| Key | Action |
+|-----|--------|
+| `f{c}` | Jump forward to character `c` on the current line |
+| `F{c}` | Jump backward to character `c` |
+| `t{c}` | Jump forward, landing before `c` |
+| `T{c}` | Jump backward, landing before `c` |
+| `;` / `,` | Repeat last `f`/`t` jump forward / backward |
+| `%` | Jump to matching bracket / parenthesis / brace |
+
+#### Scrolling
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-d` | Scroll half page down (cursor moves with view) |
+| `Ctrl-u` | Scroll half page up |
+| `Ctrl-f` | Scroll full page forward |
+| `Ctrl-b` | Scroll full page backward |
+| `zz` | Center current line in screen |
+| `zt` / `zb` | Move current line to top / bottom |
+
+#### Search-based navigation
+
+| Key | Action |
+|-----|--------|
+| `/{pattern}` | Search forward |
+| `?{pattern}` | Search backward |
+| `n` / `N` | Next / previous match |
+| `*` | Search forward for word under cursor |
+| `#` | Search backward for word under cursor |
+
+---
+
+### 0.4 Neovim editing
+
+#### Operators + motions
+
+The power of Neovim is composing an **operator** with a **motion** or **text
+object**:
+
+```
+operator  motion/text-object  →  action
+d  w      →  delete to next word
+c  iw     →  change inner word (delete word, enter Insert)
+y  $      →  yank to end of line
+>  }      →  indent to next paragraph
+```
+
+Operators: `d` (delete), `c` (change = delete + Insert), `y` (yank/copy),
+`>` / `<` (indent / unindent), `=` (auto-indent), `g~` (toggle case).
+
+Text objects (use with any operator):
+
+| Object | Meaning |
+|--------|---------|
+| `iw` / `aw` | Inner word / a word (includes trailing space) |
+| `is` / `as` | Inner sentence / a sentence |
+| `ip` / `ap` | Inner paragraph / a paragraph |
+| `i"` / `a"` | Inside / around double quotes |
+| `i'` / `a'` | Inside / around single quotes |
+| `i(` / `a(` | Inside / around parentheses |
+| `i{` / `a{` | Inside / around braces |
+| `i[` / `a[` | Inside / around brackets |
+
+#### Common editing commands
+
+| Key | Action |
+|-----|--------|
+| `x` | Delete character under cursor |
+| `r{c}` | Replace character under cursor with `c` |
+| `dd` | Delete current line |
+| `D` | Delete from cursor to end of line |
+| `yy` | Yank (copy) current line |
+| `p` / `P` | Paste after / before cursor |
+| `u` | Undo |
+| `Ctrl-r` | Redo |
+| `.` | Repeat last change |
+| `J` | Join current line with the one below |
+| `>>` / `<<` | Indent / unindent current line |
+| `~` | Toggle case of character under cursor |
+| `Ctrl-a` / `Ctrl-x` | Increment / decrement number under cursor |
+
+#### Insert-mode shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-w` | Delete previous word |
+| `Ctrl-u` | Delete from cursor to start of line |
+| `Ctrl-o` | Execute one Normal command, then return to Insert |
+
+---
+
+### 0.5 Neovim windows and splits
+
+Splits let you view multiple files at once. The `<C-h/j/k/l>` keys (custom)
+navigate between them without needing the prefix.
+
+| Key | Action |
+|-----|--------|
+| `<leader>-` | Split horizontally (new window below) |
+| `<leader>\|` | Split vertically (new window to the right) |
+| `<leader>=` | Equalize all split sizes |
+| `<C-h>` | Move focus left |
+| `<C-j>` | Move focus down |
+| `<C-k>` | Move focus up |
+| `<C-l>` | Move focus right |
+| `<leader>c` | Close current buffer (keeps the split) |
+| `:q` | Close current split |
+
+Resize splits:
+
+| Key | Action |
+|-----|--------|
+| `:resize +5` | Make the current window 5 lines taller |
+| `:vertical resize +10` | Make it 10 columns wider |
+
+---
+
+### 0.6 The Neovim command line
+
+Type `:` to enter command mode. Common commands:
+
+| Command | Action |
+|---------|--------|
+| `:w` | Save |
+| `:q` | Quit |
+| `:wq` or `:x` | Save and quit |
+| `:q!` | Quit without saving |
+| `:e <file>` | Open a file |
+| `:bn` / `:bp` | Next / previous buffer |
+| `:bd` | Delete (close) buffer |
+| `:%s/old/new/g` | Replace all occurrences in file |
+| `:s/old/new/g` | Replace in current line |
+| `:noh` | Clear search highlight |
+| `:help <topic>` | Open help |
+
+---
+
+### 0.7 Quick-start loop
+
+The following loop covers 90% of daily editing. Practice it until it is automatic:
+
+1. Open a file with `<leader>ff`.
+2. Navigate to the section with `/{pattern}`, `n`, `w`, `b`, `f{c}`.
+3. Make a change: `ciw` (change word), `dd` (delete line), `o` (new line).
+4. Undo with `u`; redo with `Ctrl-r`; repeat last change with `.`.
+5. Save with `<leader>S`.
+6. Jump to another file with `<leader>ff` or `gd` (definition).
+7. Switch pane in tmux with `Ctrl-a h/l`.
+
+---
+
 ## Part 1 — Set up and learn the IDE
 
 This part bootstraps the machine and teaches the core editing movements you will

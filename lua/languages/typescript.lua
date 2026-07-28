@@ -6,7 +6,7 @@
 --   typescript                   — TypeScript compiler (required by the server)
 --   prettier                     — formatter (optional)
 
-local lsp_lib = require("ide.lib.lsp")
+local lsp_lib = require("util.lsp")
 
 local M = {}
 

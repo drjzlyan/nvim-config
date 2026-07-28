@@ -350,11 +350,7 @@ local function setup_lsp()
     return
   end
 
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  local ok, blink = pcall(require, "blink.cmp")
-  if ok then
-    capabilities = blink.get_lsp_capabilities(capabilities)
-  end
+  local capabilities = require("util.lsp").with_blink(vim.lsp.protocol.make_client_capabilities())
 
   -- basedpyright: type checking, navigation, hover, workspace symbols, etc.
   -- The virtual-env python path is set per-client after attach so each project

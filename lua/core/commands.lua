@@ -67,7 +67,6 @@ local function dev_reload()
       or name:match("^features%.")
       or name:match("^languages%.")
       or name:match("^util%.")
-      or name:match("^ide%.")
       or name == "dev.health"
     then
       package.loaded[name] = nil
@@ -102,7 +101,7 @@ local function dev_update()
   end
 
   -- Offer to update external tooling through the dotfiles update script.
-  local dotfiles = vim.fn.expand("~/dotfiles/update.sh")
+  local dotfiles = vim.fn.expand("~/Development/dotfiles/update.sh")
   if vim.fn.filereadable(dotfiles) == 1 then
     vim.fn.jobstart({ "bash", dotfiles }, {
       detach = true,

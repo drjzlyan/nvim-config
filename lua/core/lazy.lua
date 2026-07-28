@@ -17,8 +17,6 @@ require("lazy").setup({
   spec = {
     { import = "features" },
     { import = "languages" },
-    { import = "ide.features" },
-    { import = "ide.languages" },
   },
   defaults = {
     lazy = true,

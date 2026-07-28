@@ -7,7 +7,7 @@
 --   delve      — debugger           (go install github.com/go-delve/delve@latest)
 -- Go itself is managed by mise.
 
-local lsp_lib = require("ide.lib.lsp")
+local lsp_lib = require("util.lsp")
 
 local M = {}
 

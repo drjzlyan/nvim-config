@@ -41,39 +41,48 @@ local function has_exec(name)
   return vim.fn.executable(name) == 1
 end
 
----Check a Homebrew cask JDK path.
+---Find an installed JDK for the requested version.
+---Checks mise, Homebrew, and Temurin system installs.
 ---@param version integer
 ---@return string?
-local function brew_jdk_path(version)
+function M.find_jdk(version)
+  local home = vim.fn.expand("~")
   local homebrew = vim.env.HOMEBREW_PREFIX or "/opt/homebrew"
-  local path = homebrew .. "/opt/openjdk@" .. version .. "/libexec/openjdk.jdk/Contents/Home"
-  if vim.fn.isdirectory(path) == 1 then
-    return path
-  end
-  return nil
-end
 
----Check a Temurin JDK path in /Library.
----@param version integer
----@return string?
-local function temurin_jdk_path(version)
   local paths = {
+    -- mise: exact major, temurin-N, openjdk-N
+    home .. "/.local/share/mise/installs/java/" .. version,
+    home .. "/.local/share/mise/installs/java/temurin-" .. version,
+    home .. "/.local/share/mise/installs/java/openjdk-" .. version,
+    -- Homebrew
+    homebrew .. "/opt/openjdk@" .. version .. "/libexec/openjdk.jdk/Contents/Home",
+    -- Temurin / AdoptOpenJDK system installs
     "/Library/Java/JavaVirtualMachines/temurin-" .. version .. ".jdk/Contents/Home",
     "/Library/Java/JavaVirtualMachines/adoptopenjdk-" .. version .. ".jdk/Contents/Home",
+    "/usr/local/opt/openjdk@" .. version .. "/libexec/openjdk.jdk/Contents/Home",
   }
+
   for _, path in ipairs(paths) do
     if vim.fn.isdirectory(path) == 1 then
       return path
     end
   end
-  return nil
-end
 
----Find an installed JDK for the requested version.
----@param version integer
----@return string?
-function M.find_jdk(version)
-  return brew_jdk_path(version) or temurin_jdk_path(version)
+  -- Glob for mise patch-version installs (e.g. 21.0.5)
+  local pattern = home .. "/.local/share/mise/installs/java/" .. version .. ".*"
+  local matches = vim.fn.glob(pattern, false, true)
+  if type(matches) == "table" then
+    table.sort(matches, function(a, b)
+      return a > b
+    end)
+    for _, p in ipairs(matches) do
+      if vim.fn.isdirectory(p) == 1 then
+        return p
+      end
+    end
+  end
+
+  return nil
 end
 
 ---Run the Java version command and return the version string.
@@ -336,6 +345,7 @@ function M.check_all()
     check_jdk(8),
     check_jdk(11),
     check_jdk(17),
+    check_jdk(21),
     check_java_home(),
     check_jdtls(),
     check_basedpyright(),

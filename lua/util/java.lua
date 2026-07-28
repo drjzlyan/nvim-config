@@ -1,40 +1,90 @@
 local M = {}
 
+-- All LTS / common Java major versions to probe for.
+local KNOWN_VERSIONS = { 8, 11, 17, 21, 25 }
+
+---Read selected Java versions from languages.local.
+---Returns a list of version integers (major only).
+local function selected_java_versions()
+  local path = vim.fn.expand("~/.local/share/nvim/languages.local")
+  local ok, f = pcall(io.open, path, "r")
+  if not ok or not f then
+    return {}
+  end
+  local versions = {}
+  for line in f:lines() do
+    local value = line:match("^java%s*=%s*(.+)$")
+    if value then
+      for v in value:gmatch("[^,]+") do
+        local major = tonumber(v:match("^%s*(%d+)"))
+        if major then
+          table.insert(versions, major)
+        end
+      end
+    end
+  end
+  f:close()
+  return versions
+end
+
 local function find_jdks()
   local jdks = {}
   local home = vim.fn.expand("~")
   local brew_prefix = vim.fn.exists("$HOMEBREW_PREFIX") == 1 and vim.env.HOMEBREW_PREFIX
     or (vim.fn.isdirectory("/opt/homebrew") == 1 and "/opt/homebrew" or "/usr/local")
 
-  local bases = {
-    [8] = {
-      home .. "/.local/share/mise/installs/java/8",
-      home .. "/.local/share/mise/installs/java/temurin-8",
-      brew_prefix .. "/opt/openjdk@8/libexec/openjdk.jdk/Contents/Home",
-      "/Library/Java/JavaVirtualMachines/temurin-8.jdk/Contents/Home",
-      "/usr/local/opt/openjdk@8/libexec/openjdk.jdk/Contents/Home",
-    },
-    [11] = {
-      home .. "/.local/share/mise/installs/java/11",
-      home .. "/.local/share/mise/installs/java/temurin-11",
-      brew_prefix .. "/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home",
-      "/Library/Java/JavaVirtualMachines/temurin-11.jdk/Contents/Home",
-      "/usr/local/opt/openjdk@11/libexec/openjdk.jdk/Contents/Home",
-    },
-    [17] = {
-      home .. "/.local/share/mise/installs/java/17",
-      home .. "/.local/share/mise/installs/java/temurin-17",
-      brew_prefix .. "/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home",
-      "/Library/Java/JavaVirtualMachines/temurin-17.jdk/Contents/Home",
-      "/usr/local/opt/openjdk@17/libexec/openjdk.jdk/Contents/Home",
-    },
-  }
+  -- Collect all versions to check: user-selected first, then well-known LTS
+  local to_check = {}
+  local seen = {}
+  for _, v in ipairs(selected_java_versions()) do
+    if not seen[v] then
+      seen[v] = true
+      table.insert(to_check, v)
+    end
+  end
+  for _, v in ipairs(KNOWN_VERSIONS) do
+    if not seen[v] then
+      seen[v] = true
+      table.insert(to_check, v)
+    end
+  end
 
-  for version, paths in pairs(bases) do
+  for _, version in ipairs(to_check) do
+    local paths = {
+      -- mise: exact major, temurin-N, openjdk-N, and glob for N.x.y variants
+      home .. "/.local/share/mise/installs/java/" .. version,
+      home .. "/.local/share/mise/installs/java/temurin-" .. version,
+      home .. "/.local/share/mise/installs/java/openjdk-" .. version,
+      -- Homebrew
+      brew_prefix .. "/opt/openjdk@" .. version .. "/libexec/openjdk.jdk/Contents/Home",
+      -- Temurin / AdoptOpenJDK system installs
+      "/Library/Java/JavaVirtualMachines/temurin-" .. version .. ".jdk/Contents/Home",
+      "/Library/Java/JavaVirtualMachines/adoptopenjdk-" .. version .. ".jdk/Contents/Home",
+      "/usr/local/opt/openjdk@" .. version .. "/libexec/openjdk.jdk/Contents/Home",
+    }
+
     for _, p in ipairs(paths) do
       if vim.fn.isdirectory(p) == 1 then
         jdks[version] = p
         break
+      end
+    end
+
+    -- Glob for mise installs that include patch versions (e.g. 21.0.5)
+    if not jdks[version] then
+      local pattern = home .. "/.local/share/mise/installs/java/" .. version .. ".*"
+      local matches = vim.fn.glob(pattern, false, true)
+      if type(matches) == "table" then
+        -- Sort descending so newest patch is first
+        table.sort(matches, function(a, b)
+          return a > b
+        end)
+        for _, p in ipairs(matches) do
+          if vim.fn.isdirectory(p) == 1 then
+            jdks[version] = p
+            break
+          end
+        end
       end
     end
   end
@@ -46,8 +96,18 @@ function M.resolve_jdk()
   if vim.env.JAVA_HOME and vim.fn.isdirectory(vim.env.JAVA_HOME) == 1 then
     return vim.env.JAVA_HOME
   end
+
   local jdks = find_jdks()
-  for _, v in ipairs({ 17, 11, 8 }) do
+
+  -- Prefer user-selected Java version
+  for _, v in ipairs(selected_java_versions()) do
+    if jdks[v] then
+      return jdks[v]
+    end
+  end
+
+  -- Fall back: newest known version first
+  for _, v in ipairs({ 25, 21, 17, 11, 8 }) do
     if jdks[v] then
       return jdks[v]
     end

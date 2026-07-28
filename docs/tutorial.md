@@ -2,8 +2,9 @@
 
 A hands-on, keystroke-by-keystroke walkthrough for the `dotfiles` + `nvim-config`
 development environment. Unlike the reference docs, this guide is sequenced: follow
-it top to bottom and you will have edited, built, tested, debugged, and committed
-code in Python and Java, and managed a repository with lazygit.
+it top to bottom and you will have selected languages, edited, built, tested,
+debugged, and committed code in Python and Java, and managed a repository with
+lazygit.
 
 Prerequisites:
 
@@ -70,22 +71,47 @@ nvim
 On first launch `lazy.nvim` bootstraps itself, installs all plugins, and writes
 `lazy-lock.json`. Wait for the notifications to finish.
 
-### 1.3 Install the language servers (externally, never Mason)
+### 1.3 Select programming languages
 
-The config intentionally does **not** use Mason. Install servers with Homebrew:
+`install.sh` launches an interactive language selector after the editor config
+is linked. Choose the languages you want — the IDE and tool installer adapt
+automatically:
+
+```
+  ╔═══════════════════════════════════════════════════════════╗
+  ║          Language Selection for Neovim IDE                ║
+  ╠═══════════════════════════════════════════════════════════╣
+  ║  Common languages are always available:                   ║
+  ║    JSON, YAML, Bash, Lua, TOML, Markdown                  ║
+  ╠═══════════════════════════════════════════════════════════╣
+  ║  Toggle languages by number. Press Enter when done.      ║
+  ╚═══════════════════════════════════════════════════════════╝
+
+  [✓] 1. python       Python — basedpyright, ruff, pytest, debugpy
+  [ ] 2. java        Java — jdtls, lombok, google-java-format, Maven/Gradle, JUnit
+  [ ] 3. typescript  TypeScript/JS — typescript-language-server, prettier
+  [ ] 4. go          Go — gopls, goimports, delve
+  [ ] 5. cpp         C/C++ — clangd, clang-format
+  [ ] 6. rust        Rust — rust-analyzer, rustfmt, cargo
+```
+
+Common languages (JSON, YAML, Bash, Lua, TOML, Markdown) are **always
+available** — you don't select them.
+
+To add or remove languages later (without re-running the full installer):
 
 ```bash
-# config-file languages
-brew install lua-language-server vscode-json-languageserver yaml-language-server \
-  bash-language-server taplo marksman
-
-# Python
-brew install basedpyright ruff          # or: uv tool install basedpyright ruff
-
-# Java
-brew install openjdk@8 openjdk@11 openjdk@17 jdtls lombok \
-  google-java-format maven gradle
+~/Development/dotfiles/scripts/languages.sh          # interactive menu
+~/Development/dotfiles/scripts/languages.sh --list   # show current selection
+~/Development/dotfiles/scripts/languages.sh --all     # select all + install tools
 ```
+
+The selection is saved to `~/.local/share/nvim/languages.local` and is
+non-destructive — your existing settings are never modified. After changing
+the selection, restart Neovim and the new language modules load automatically.
+
+See [`docs/languages.md`](languages.md) for the full list of tools and
+keymaps per language.
 
 ### 1.4 Verify the environment
 
@@ -630,20 +656,23 @@ floating.)
 | Grep the project | `<leader>s/` |
 | Go to definition / references | `gd` / `gr` |
 | Rename a symbol | `<leader>lr` |
+| Format the current buffer | `<leader>lf` |
 | Run the current Python file | `<leader>pr` |
 | Run the Python test under the cursor | `<leader>ptf` |
 | Debug (Python or Java) | `<leader>db` (breakpoint) → `<leader>dc` (start) |
 | Compile a Java project | `<leader>jc` |
 | Run the Java test under the cursor | `<leader>jt` |
 | Restart jdtls | `<leader>Ww` |
+| Organize Go imports | `<leader>lI` (in Go buffers) |
 | Open lazygit | `<leader>gg` |
 | Review all current changes | `<leader>gd` |
+| Select or change languages | `~/Development/dotfiles/scripts/languages.sh` |
 | Check the environment | `:DevHealth` |
 
 For the full reference, see the other docs in this folder:
 
-- [`installation.md`](installation.md) — [`keymaps.md`](keymaps.md) —
-  [`python.md`](python.md) — [`java.md`](java.md) —
+- [`languages.md`](languages.md) — [`installation.md`](installation.md) —
+  [`keymaps.md`](keymaps.md) — [`python.md`](python.md) — [`java.md`](java.md) —
   [`debugging.md`](debugging.md) — [`terminal.md`](terminal.md) —
   [`tasks.md`](tasks.md) — [`health.md`](health.md) —
   [`troubleshooting.md`](troubleshooting.md) — [`faq.md`](faq.md)

@@ -51,7 +51,11 @@ duplicate completion configuration.
 
 ## Supported language servers
 
-Servers are installed and updated externally with Homebrew. Mason is not used.
+Servers are installed and updated externally. Mason is not used. Selectable
+language servers are installed by `scripts/install-tools.sh` based on the
+user's language selection (see [`languages.md`](languages.md)).
+
+### Always available (common/config languages)
 
 | Server | Filetype(s) | Package |
 |--------|-------------|---------|
@@ -61,9 +65,6 @@ Servers are installed and updated externally with Homebrew. Mason is not used.
 | `bashls` | `sh`, `zsh` | `bash-language-server` |
 | `taplo` | `toml` | `taplo` |
 | `marksman` | `markdown` | `marksman` |
-| `jdtls` | `java` | `jdtls` |
-| `basedpyright` | `python` | `basedpyright` |
-| `ruff` | `python` | `ruff` |
 
 Install the config-file servers:
 
@@ -71,8 +72,21 @@ Install the config-file servers:
 brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman
 ```
 
+### Selectable (installed only when the user chooses the language)
+
+| Server | Filetype(s) | Language | Install method |
+|--------|-------------|----------|----------------|
+| `basedpyright` | `python` | Python | `uv tool install` |
+| `ruff` | `python` | Python | `uv tool install` |
+| `jdtls` | `java` | Java | download |
+| `ts_ls` | `typescript`, `javascript` | TypeScript/JS | `npm install -g` |
+| `gopls` | `go` | Go | `go install` |
+| `clangd` | `c`, `cpp` | C/C++ | `brew install` |
+| `rust_analyzer` | `rust` | Rust | `rustup component add` |
+
 Python and Java servers are documented in [`python.md`](python.md) and
-[`java.md`](java.md).
+[`java.md`](java.md). All selectable languages are documented in
+[`languages.md`](languages.md).
 
 ## Diagnostics
 

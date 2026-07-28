@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 TOOLS_DIR="${TOOLS_DIR:-$HOME/.local/share/ide-tools}"
 BIN_DIR="$TOOLS_DIR/bin"
+LANGUAGES_FILE="${LANGUAGES_FILE:-$HOME/.local/share/nvim/languages.local}"
 
 mkdir -p "$TOOLS_DIR" "$BIN_DIR"
 
@@ -13,6 +14,31 @@ source "$SCRIPT_DIR/tools.lock"
 log() {
   printf '[install-tools] %s\n' "$*"
 }
+
+# ---------------------------------------------------------------------------
+# Language selection helpers
+# ---------------------------------------------------------------------------
+
+selected_languages=()
+if [[ -f "$LANGUAGES_FILE" ]]; then
+  while IFS= read -r line; do
+    line="${line%%#*}"
+    line="$(echo "$line" | xargs)"
+    [[ -n "$line" ]] && selected_languages+=("$line")
+  done < "$LANGUAGES_FILE"
+fi
+
+has_language() {
+  local lang="$1"
+  for s in "${selected_languages[@]}"; do
+    [[ "$s" == "$lang" ]] && return 0
+  done
+  return 1
+}
+
+# ---------------------------------------------------------------------------
+# Checksum / install helpers
+# ---------------------------------------------------------------------------
 
 verify_checksum() {
   local file="$1"
@@ -34,6 +60,50 @@ install_uv_tool() {
   log "Installing $name==$version"
   uv tool install --force "$name==$version"
 }
+
+install_npm_tool() {
+  local name="$1"
+  local version="${2:-latest}"
+  if ! command -v npm >/dev/null 2>&1; then
+    log "npm not found; skipping $name"
+    return 1
+  fi
+  if [[ "$version" == "latest" ]]; then
+    log "Installing $name (latest)"
+    npm install -g "$name"
+  else
+    log "Installing $name@$version"
+    npm install -g "$name@$version"
+  fi
+}
+
+install_go_tool() {
+  local url="$1"
+  if ! command -v go >/dev/null 2>&1; then
+    log "go not found; skipping $url"
+    return 1
+  fi
+  log "Installing $url"
+  go install "$url"
+}
+
+install_brew() {
+  local pkg="$1"
+  if command -v brew >/dev/null 2>&1; then
+    if ! brew list "$pkg" >/dev/null 2>&1; then
+      log "Installing $pkg via brew"
+      brew install "$pkg"
+    else
+      log "$pkg already installed via brew"
+    fi
+  else
+    log "brew not found; skipping $pkg"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Language-specific installers
+# ---------------------------------------------------------------------------
 
 install_jdtls() {
   local version="$JDTLS_VERSION"
@@ -105,21 +175,65 @@ install_vsix() {
   log "Installed $name -> $TOOLS_DIR/$name"
 }
 
+# ---------------------------------------------------------------------------
+# Main: install tools only for selected languages
+# ---------------------------------------------------------------------------
+
 main() {
-  if ! command -v uv >/dev/null 2>&1; then
-    log "uv is required to install Python tools"
-    exit 1
+  if [[ ${#selected_languages[@]} -eq 0 ]]; then
+    log "No languages selected. Run the dotfiles language selector first:"
+    log "  ~/Development/dotfiles/scripts/languages.sh"
+    log "Installing common tools only."
   fi
 
-  install_uv_tool basedpyright "$BASEDPYRIGHT_VERSION"
-  install_uv_tool ruff "$RUFF_VERSION"
+  # Python
+  if has_language "python"; then
+    if ! command -v uv >/dev/null 2>&1; then
+      log "uv is required for Python tools"
+    else
+      install_uv_tool basedpyright "$BASEDPYRIGHT_VERSION"
+      install_uv_tool ruff "$RUFF_VERSION"
+    fi
+  fi
 
-  install_jdtls
-  install_lombok
-  install_vsix java-debug JAVA_DEBUG_VERSION JAVA_DEBUG_URL JAVA_DEBUG_SHA256
-  install_vsix java-test JAVA_TEST_VERSION JAVA_TEST_URL JAVA_TEST_SHA256
+  # Java
+  if has_language "java"; then
+    install_jdtls
+    install_lombok
+    install_vsix java-debug JAVA_DEBUG_VERSION JAVA_DEBUG_URL JAVA_DEBUG_SHA256
+    install_vsix java-test JAVA_TEST_VERSION JAVA_TEST_URL JAVA_TEST_SHA256
+  fi
 
-  log "All external tools installed to $TOOLS_DIR"
+  # TypeScript / JavaScript
+  if has_language "typescript"; then
+    install_npm_tool typescript-language-server "$TSSERVER_VERSION"
+    install_npm_tool typescript "$TYPESCRIPT_VERSION"
+    install_npm_tool prettier "$PRETTIER_VERSION"
+  fi
+
+  # Go
+  if has_language "go"; then
+    install_go_tool "golang.org/x/tools/gopls@latest"
+    install_go_tool "golang.org/x/tools/cmd/goimports@latest"
+    install_go_tool "github.com/go-delve/delve@latest"
+  fi
+
+  # C / C++
+  if has_language "cpp"; then
+    install_brew "clangd"
+  fi
+
+  # Rust
+  if has_language "rust"; then
+    if command -v rustup >/dev/null 2>&1; then
+      log "Adding rust-analyzer via rustup"
+      rustup component add rust-analyzer
+    else
+      install_brew "rust-analyzer"
+    fi
+  fi
+
+  log "Tool installation complete for selected languages: ${selected_languages[*]:-none}"
 }
 
 main "$@"

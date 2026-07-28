@@ -9,23 +9,43 @@ return {
       "nvim-treesitter/nvim-treesitter-context",
     },
     config = function()
+      -- Base parsers always installed (common/config languages + editing)
+      local ensure_installed = {
+        "lua",
+        "vim",
+        "vimdoc",
+        "bash",
+        "markdown",
+        "markdown_inline",
+        "json",
+        "yaml",
+        "toml",
+        "dockerfile",
+        "gitignore",
+      }
+
+      -- Extra parsers keyed by language name (matches languages.local entries)
+      local lang_parsers = {
+        python = { "python", "requirements" },
+        java = { "java" },
+        typescript = { "typescript", "tsx", "javascript" },
+        go = { "go", "gomod", "gosum" },
+        cpp = { "cpp", "c" },
+        rust = { "rust" },
+      }
+
+      -- Add parsers for selected languages
+      local ok, langs = pcall(require, "languages")
+      if ok and langs.selected then
+        for _, lang in ipairs(langs.selected()) do
+          if lang_parsers[lang] then
+            vim.list_extend(ensure_installed, lang_parsers[lang])
+          end
+        end
+      end
+
       require("nvim-treesitter.configs").setup({
-        -- Only the parsers needed for configuration files and editing basics
-        ensure_installed = {
-          "lua",
-          "python",
-          "java",
-          "vim",
-          "vimdoc",
-          "bash",
-          "markdown",
-          "markdown_inline",
-          "json",
-          "yaml",
-          "toml",
-          "dockerfile",
-          "gitignore",
-        },
+        ensure_installed = ensure_installed,
         sync_install = false,
         auto_install = false,
 

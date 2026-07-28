@@ -1,6 +1,8 @@
+# Python tools (installed via uv)
 BASEDPYRIGHT_VERSION=1.13.0
 RUFF_VERSION=0.6.4
 
+# Java tools (downloaded directly)
 JDTLS_VERSION=1.40.0
 JDTLS_URL=https://www.eclipse.org/downloads/download.php?file=/jdtls/snapshots/jdt-language-server-${JDTLS_VERSION}-202406271335.tar.gz
 JDTLS_SHA256=
@@ -16,3 +18,20 @@ JAVA_DEBUG_SHA256=
 JAVA_TEST_VERSION=0.43.0
 JAVA_TEST_URL=https://github.com/microsoft/vscode-java-test/releases/download/v${JAVA_TEST_VERSION}/vscjava.vscode-java-test-${JAVA_TEST_VERSION}.vsix
 JAVA_TEST_SHA256=
+
+# TypeScript / JavaScript tools (installed via npm)
+TSSERVER_VERSION=latest
+TYPESCRIPT_VERSION=latest
+PRETTIER_VERSION=latest
+
+# Go tools (installed via go install)
+# Versions are pinned by the Go toolchain; "latest" is used here
+GOLANGCI_LINT_VERSION=latest
+
+# C / C++ tools (installed via brew)
+# clangd and clang-format come from the llvm/clangd formula
+CLANGD_VERSION=latest
+
+# Rust tools (installed via rustup)
+# rust-analyzer and rustfmt are rustup components
+RUST_ANALYZER_VERSION=latest

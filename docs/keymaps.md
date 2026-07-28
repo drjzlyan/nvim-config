@@ -154,6 +154,32 @@ Java keymaps are active only in Java buffers.
 | `<leader>jl` | n | Workspace logs |
 | `<leader>jw` | n | Restart workspace |
 
+## TypeScript / JavaScript
+
+No dedicated keymaps; use the shared LSP keys (`gd`, `gr`, `K`, `<leader>la`,
+`<leader>lr`, `<leader>lf`). Format on save runs automatically via `prettier`.
+
+## Go
+
+Go keymaps are active only in Go buffers.
+
+| Key | Mode | Action |
+|-----|------|--------|
+| `<leader>lI` | n | Organize imports (goimports) |
+
+Format on save runs `goimports` + `gofmt` automatically via `gopls`. Use
+`<leader>lf` for manual formatting.
+
+## C / C++
+
+No dedicated keymaps; use the shared LSP keys. Format on save runs
+`clang-format` automatically via `clangd`.
+
+## Rust
+
+No dedicated keymaps; use the shared LSP keys. Format on save runs `rustfmt`
+automatically via `rust-analyzer`.
+
 ## Debug (`nvim-dap`)
 
 | Key | Mode | Action |

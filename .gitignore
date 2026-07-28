@@ -6,3 +6,6 @@
 
 # Lazy.nvim state is managed automatically.
 # lazy-lock.json is intentionally committed for reproducibility.
+
+# Machine-local language selection (created by dotfiles/scripts/languages.sh)
+languages.local

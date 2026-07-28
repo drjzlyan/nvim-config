@@ -326,7 +326,10 @@ definitions. Completion and LSP share capabilities via
 ## Supported language servers
 
 Language servers and formatters are intentionally **not** managed by Mason.
-Install them with Homebrew or `uv`:
+They are installed by `scripts/install-tools.sh` based on the user's language
+selection (see [`docs/languages.md`](docs/languages.md)).
+
+**Always available** (common/config languages):
 
 | Server | Language | Package |
 |--------|----------|---------|
@@ -336,13 +339,28 @@ Install them with Homebrew or `uv`:
 | `bashls` | Bash / Zsh | `bash-language-server` |
 | `taplo` | TOML | `taplo` |
 | `marksman` | Markdown | `marksman` |
-| `jdtls` | Java | `jdtls` |
-| `basedpyright` | Python | `basedpyright` |
-| `ruff` | Python | `ruff` |
-| `google-java-format` | Java | `google-java-format` |
+
+**Selectable** (installed only when the user chooses the language):
+
+| Server | Language | Install method |
+|--------|----------|----------------|
+| `basedpyright`, `ruff` | Python | `uv tool install` |
+| `jdtls`, `google-java-format` | Java | download + brew |
+| `typescript-language-server` | TypeScript/JS | `npm install -g` |
+| `gopls`, `goimports` | Go | `go install` |
+| `clangd` | C/C++ | `brew install clangd` |
+| `rust-analyzer` | Rust | `rustup component add` |
+
+Install the always-on servers:
 
 ```bash
-brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman jdtls basedpyright ruff google-java-format
+brew install lua-language-server vscode-json-languageserver yaml-language-server bash-language-server taplo marksman
+```
+
+For selectable languages, use the language selector:
+
+```bash
+~/Development/dotfiles/scripts/languages.sh
 ```
 
 ## Installation
@@ -366,7 +384,8 @@ The `lazy-lock.json` is committed for reproducibility.
 
 ## Documentation
 
-- [`docs/tutorial.md`](docs/tutorial.md) — hands-on walkthrough: IDE setup, Python, Java, and lazygit
+- [`docs/tutorial.md`](docs/tutorial.md) — hands-on walkthrough: IDE setup, language selection, Python, Java, and lazygit
+- [`docs/languages.md`](docs/languages.md) — language selection system and per-language reference
 - [`docs/architecture.md`](docs/architecture.md)
 - [`docs/installation.md`](docs/installation.md)
 - [`docs/plugins.md`](docs/plugins.md)

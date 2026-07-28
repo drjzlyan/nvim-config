@@ -116,6 +116,8 @@ return {
           ok, adapter = pcall(require, "languages.lib.python-debug")
         elseif ft == "java" then
           ok, adapter = pcall(require, "languages.lib.java-debug")
+        elseif ft == "go" then
+          ok, adapter = pcall(require, "languages.lib.go-debug")
         end
         if ok and adapter and adapter.setup then
           adapter.setup()
@@ -140,6 +142,16 @@ return {
         pattern = "java",
         callback = function()
           local ok, adapter = pcall(require, "languages.lib.java-debug")
+          if ok and adapter and adapter.setup then
+            adapter.setup()
+          end
+        end,
+      })
+      vim.api.nvim_create_autocmd("FileType", {
+        group = augroup,
+        pattern = "go",
+        callback = function()
+          local ok, adapter = pcall(require, "languages.lib.go-debug")
           if ok and adapter and adapter.setup then
             adapter.setup()
           end

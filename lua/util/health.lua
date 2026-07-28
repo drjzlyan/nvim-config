@@ -329,10 +329,29 @@ local function check_lombok()
   }
 end
 
+---Read which languages are selected from languages.local.
+---@return table<string, boolean>
+local function selected_languages()
+  local langs = {}
+  local path = vim.fn.expand("~/.local/share/nvim/languages.local")
+  local f = io.open(path, "r")
+  if not f then
+    return langs
+  end
+  for line in f:lines() do
+    local lang = line:match("^([%a]+)=")
+    if lang then
+      langs[lang] = true
+    end
+  end
+  f:close()
+  return langs
+end
+
 ---Return all health check results.
 ---@return DevHealthResult[]
 function M.check_all()
-  return {
+  local results = {
     check_neovim(),
     check_git(),
     check_ripgrep(),
@@ -342,18 +361,76 @@ function M.check_all()
     check_ghostty(),
     check_tmux(),
     check_uv(),
-    check_jdk(8),
-    check_jdk(11),
-    check_jdk(17),
-    check_jdk(21),
-    check_java_home(),
-    check_jdtls(),
-    check_basedpyright(),
-    check_ruff(),
-    check_debugpy(),
-    check_google_java_format(),
-    check_lombok(),
   }
+
+  local langs = selected_languages()
+
+  if langs.python then
+    vim.list_extend(results, {
+      check_basedpyright(),
+      check_ruff(),
+      check_debugpy(),
+    })
+  end
+
+  if langs.java then
+    vim.list_extend(results, {
+      check_jdk(8),
+      check_jdk(11),
+      check_jdk(17),
+      check_jdk(21),
+      check_java_home(),
+      check_jdtls(),
+      check_google_java_format(),
+      check_lombok(),
+    })
+    if vim.fn.executable("mvn") == 1 then
+      table.insert(results, check_tool("mvn", { "mvn", "--version" }, "brew install maven"))
+    end
+    if vim.fn.executable("gradle") == 1 then
+      table.insert(results, check_tool("gradle", { "gradle", "--version" }, "brew install gradle"))
+    end
+    if vim.fn.executable("mvn") ~= 1 and vim.fn.executable("gradle") ~= 1 then
+      table.insert(results, {
+        name = "mvn / gradle",
+        status = "missing",
+        message = "brew install maven  (or: brew install gradle)",
+      })
+    end
+  end
+
+  if langs.typescript then
+    vim.list_extend(results, {
+      check_tool("node", { "node", "--version" }, "install via mise: mise install node"),
+      check_tool("typescript-language-server", { "typescript-language-server", "--version" }, "npm install -g typescript-language-server typescript"),
+      check_tool("prettier", { "prettier", "--version" }, "npm install -g prettier"),
+    })
+  end
+
+  if langs.go then
+    vim.list_extend(results, {
+      check_tool("go", { "go", "version" }, "install via mise: mise install go"),
+      check_tool("gopls", { "gopls", "version" }, "go install golang.org/x/tools/gopls@latest"),
+      check_tool("goimports", nil, "go install golang.org/x/tools/cmd/goimports@latest"),
+      check_tool("dlv", { "dlv", "version" }, "go install github.com/go-delve/delve/cmd/dlv@latest"),
+    })
+  end
+
+  if langs.cpp then
+    vim.list_extend(results, {
+      check_tool("clangd", { "clangd", "--version" }, "brew install clangd"),
+    })
+  end
+
+  if langs.rust then
+    vim.list_extend(results, {
+      check_tool("cargo", { "cargo", "--version" }, "install via rustup.rs"),
+      check_tool("rust-analyzer", { "rust-analyzer", "--version" }, "rustup component add rust-analyzer"),
+      check_tool("rustfmt", { "rustfmt", "--version" }, "rustup component add rustfmt"),
+    })
+  end
+
+  return results
 end
 
 ---Render health results into a buffer.

@@ -221,6 +221,7 @@ main() {
     else
       install_uv_tool "basedpyright" "latest"
       install_uv_tool "ruff" "latest"
+      install_uv_tool "debugpy" "latest"
     fi
   fi
 
@@ -234,6 +235,7 @@ main() {
     install_vsix "java-test" "0.46.0" \
       "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/vscjava/vsextensions/vscode-java-test/\${VERSION}/vspackage"
     install_brew "maven"
+    install_brew "gradle"
   fi
 
   # TypeScript / JavaScript
@@ -260,6 +262,9 @@ main() {
     if command -v rustup >/dev/null 2>&1; then
       log "Adding rust-analyzer via rustup"
       rustup component add rust-analyzer
+      log "Adding rustfmt and clippy via rustup"
+      rustup component add rustfmt
+      rustup component add clippy
     else
       install_brew "rust-analyzer"
     fi

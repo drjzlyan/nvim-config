@@ -244,6 +244,68 @@ Shared LSP keys (work in both Python and Java once a server has attached):
 Sessions are saved/restored automatically per project. Manual control:
 `:SessionSave`, `:SessionRestore`, `:SessionDelete`.
 
+### 1.6 The `dev` tmux session and agent management
+
+The `dev` command launches a pre-configured tmux session with panes for the
+editor, an AI coding agent, and a build/test shell, plus a lazygit window.
+
+```bash
+dev                     # session named after current dir
+dev myproject           # session named "myproject"
+dev -a claude           # use a specific agent
+dev -k                  # kill existing session and recreate
+```
+
+**Agent auto-detection**: if you don't pass `-a`, `dev` scans your `$PATH` for
+known coding agents (crush, claude, codex, gemini, aider, copilot). If multiple
+are found, an interactive menu appears:
+
+```
+  Multiple coding agents detected:
+
+  1. crush
+  2. claude
+  3. gemini
+  0. none (just a shell)
+
+  Enter a number, type a command name, or Enter for #1.
+  Ctrl-C cancels (opens a shell).
+```
+
+If only one agent is found, it is used automatically. If none are found, a
+shell opens in the agent pane. Pressing Ctrl-C at the menu opens a shell (no
+agent) — this is the default/reset state.
+
+**In-session agent management** (tmux keybindings, available while you work):
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-a A` | Interactive agent switcher (type the agent name) |
+| `Ctrl-a N` | Cycle to the next detected agent |
+| `Ctrl-a D` | Reset pane layout to default (preserves nvim) |
+
+`Ctrl-a D` is the escape hatch: if you accidentally closed a pane, resized
+panes badly, or just want to start fresh, it kills all panes except nvim and
+rebuilds the default layout. The current agent is relaunched automatically.
+
+**Pane navigation** (vi-style, works in all tmux sessions):
+
+| Key | Action |
+|-----|--------|
+| `Ctrl-a h/j/k/l` | Move left/down/up/right (vi-style) |
+| `Ctrl-a H/J/K/L` | Resize pane (repeatable) |
+| `Ctrl-a \|` | Split right |
+| `Ctrl-a -` | Split below |
+| `Ctrl-a g` | Open lazygit in a new window |
+| `Ctrl-a s` | Switch session |
+| `Ctrl-a r` | Reload tmux config |
+
+**Checking agent status** from the command line:
+
+```bash
+ide-agent status   # show current agent and available agents
+```
+
 You are ready. Quit with `<leader>Z` and move on.
 
 ---

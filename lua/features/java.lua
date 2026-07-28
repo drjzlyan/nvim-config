@@ -1,7 +1,7 @@
 return {
   {
     "stevearc/conform.nvim",
-    event = { "BufReadPre", "BufNewFile" },
+    ft = { "java" },
     cmd = { "ConformInfo" },
     config = function()
       require("conform").setup({

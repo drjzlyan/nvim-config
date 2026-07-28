@@ -5,21 +5,7 @@ local terminal = nil
 local function get_terminal()
   if terminal == nil then
     local Terminal = require("toggleterm.terminal").Terminal
-    terminal = Terminal:new({
-      direction = "float",
-      float_opts = {
-        border = "curved",
-        width = function()
-          return math.floor(vim.o.columns * 0.85)
-        end,
-        height = function()
-          return math.floor(vim.o.lines * 0.85)
-        end,
-      },
-      on_open = function()
-        vim.cmd("startinsert!")
-      end,
-    })
+    terminal = Terminal:new({ direction = "float" })
   end
   return terminal
 end

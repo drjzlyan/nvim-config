@@ -63,11 +63,7 @@ return {
         end,
       })
 
-      local capabilities = vim.lsp.protocol.make_client_capabilities()
-      local ok, blink = pcall(require, "blink.cmp")
-      if ok then
-        capabilities = blink.get_lsp_capabilities(capabilities)
-      end
+      local capabilities = require("util.lsp").with_blink(vim.lsp.protocol.make_client_capabilities())
 
       -- Ensure lspconfig server definitions are registered with vim.lsp.config.
       local lspconfig = require("lspconfig")

@@ -61,7 +61,7 @@ Plugins:
 - `nvim-treesitter` + `nvim-treesitter-textobjects` — syntax, selection, text objects
 - `mini.pairs` — auto-close pairs
 - `mini.surround` — add/change/delete surrounding pairs
-- `Comment.nvim` — `gc`/`gcc` commenting
+- Native Neovim commenting — `gc`/`gcc` (built-in since Neovim 0.10, no plugin needed)
 - `todo-comments.nvim` — TODO/FIXME/etc. highlighting and search
 
 ### Phase 3 (done)

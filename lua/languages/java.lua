@@ -8,11 +8,7 @@ local java_augroup = vim.api.nvim_create_augroup("JavaDev", { clear = true })
 
 local function jdtls_config(bufnr)
   local root = project.root(bufnr)
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  local ok, blink = pcall(require, "blink.cmp")
-  if ok then
-    capabilities = blink.get_lsp_capabilities(capabilities)
-  end
+  local capabilities = require("util.lsp").with_blink(vim.lsp.protocol.make_client_capabilities())
 
   return {
     cmd = java_util.jdtls_cmd(root),
@@ -128,6 +124,11 @@ local java_provider = {
 local testing = require("util.testing")
 if testing then
   testing.register("java", java_testing)
+end
+
+local ok, tasks = pcall(require, "util.tasks")
+if ok and tasks.register_provider then
+  tasks.register_provider("java", java_provider)
 end
 
 return {}

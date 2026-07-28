@@ -65,7 +65,7 @@ Every tmux command starts with the prefix.
 | `Ctrl-a 1`–`9` | Jump to window by number |
 | `Ctrl-a ,` | Rename current window |
 | `Ctrl-a &` | Close current window (confirm) |
-| `Ctrl-a g` | Open lazygit in a new window (dotfiles binding) |
+| `Ctrl-a g` | Open lazygit (reuses existing window or creates one) |
 | `Ctrl-a P` | Start a new project session (dotfiles binding) |
 
 #### Pane navigation and management
@@ -533,7 +533,7 @@ Sessions are saved/restored automatically per project. Manual control:
 ### 1.6 The `dev` tmux session and agent management
 
 The `dev` command launches a pre-configured tmux session with panes for the
-editor, an AI coding agent, and a build/test shell, plus a lazygit window.
+editor, an AI coding agent, and a build/test shell.
 
 ```bash
 dev                     # session named after current dir
@@ -582,9 +582,18 @@ rebuilds the default layout. The current agent is relaunched automatically.
 | `Ctrl-a H/J/K/L` | Resize pane (repeatable) |
 | `Ctrl-a \|` | Split right |
 | `Ctrl-a -` | Split below |
-| `Ctrl-a g` | Open lazygit in a new window |
 | `Ctrl-a s` | Switch session |
 | `Ctrl-a r` | Reload tmux config |
+
+**Git workflow:**
+
+`Ctrl-a g` opens lazygit in a dedicated tmux window. If the window already exists
+it switches to it rather than opening a duplicate. Close lazygit with `q` to
+return to the previous window.
+
+From inside nvim, use `<leader>gd` to review a full diff before committing, and
+hunk-level `<leader>g*` keys (stage, reset, preview) for in-editor work. For
+commits, push, pull, and branching, switch to the lazygit window with `Ctrl-a g`.
 
 **Checking agent status** from the command line:
 
@@ -1016,7 +1025,7 @@ Start a `dev` session for a TypeScript project:
 dev calc-ts
 ```
 
-This opens a 3-pane layout (nvim | agent / build-test) plus a lazygit window.
+This opens a 3-pane layout (nvim | agent / build-test).
 Run `npm run build` in the bottom-right pane, jump there with `Ctrl-a j`,
 jump back to nvim with `Ctrl-a h` (vi-style tmux navigation).
 
@@ -1107,7 +1116,7 @@ dev calc-go
 ```
 
 Run `go test ./...` in the build/test pane (`Ctrl-a j`), review failures, fix
-in nvim (`Ctrl-a h`), re-run. Use `Ctrl-a g` to open lazygit for committing.
+in nvim (`Ctrl-a h`), re-run. Commit via `Ctrl-a g` (lazygit tmux window).
 
 You have now built and tested Go.
 
@@ -1311,7 +1320,7 @@ dev calc-rs
 ```
 
 Run `cargo test` in the build/test pane, iterate in nvim, commit via
-`Ctrl-a g` (lazygit window).
+`Ctrl-a g` (lazygit tmux window).
 
 You have now built and tested Rust.
 
@@ -1365,10 +1374,10 @@ committing.
 
 ### 4.4 lazygit — the main event
 
-Open it with `<leader>gg` (or `:LazyGit`). It opens in a centered floating
-terminal (90% of the editor) and closes automatically when you quit lazygit. If
-lazygit isn't installed you'll get `brew install lazygit`; if you're not in a
-repo you'll get a warning. (`lazygit` is installed by the dotfiles Brewfile.)
+Open it with `Ctrl-a g`. It opens in a dedicated tmux window named `git`. If the
+window is already open, tmux switches to it instead of creating a duplicate. Close
+lazygit with `q` to return to the previous window. (`lazygit` is installed by the
+dotfiles Brewfile.)
 
 Lazygit is a full TUI for Git. Press `?` inside it at any time to see every
 contextual key for the current panel. The top bar shows panels you switch between
@@ -1398,20 +1407,20 @@ Core keys (from the Status/Files panel):
 | `?` | Show all keys for the current panel |
 | `q` / `<Esc>` | Quit lazygit (returns to Neovim, window auto-closes) |
 
-When you edit a file from inside lazygit (`e`) it opens in the Neovim that
-launched it. After committing, close lazygit (`q`) and the `<leader>g` hunk signs
-update automatically.
+When you edit a file from inside lazygit (`e`), it opens in your `$EDITOR`
+(Neovim). After committing, `q` closes lazygit and tmux returns you to the
+previous window. Gitsigns hunk signs in nvim refresh on the next buffer read.
 
 A complete session:
 
-1. Make edits in Neovim (Python or Java).
-2. `<leader>gd` to review all changes; fix anything.
-3. `<leader>gg` to open lazygit.
+1. Make edits in Neovim.
+2. `<leader>gd` to review all changes in diffview; fix anything.
+3. `Ctrl-a g` to switch to the lazygit window.
 4. In the Files panel: `<space>` to stage hunks, or `a` to stage all.
 5. `c`, type a message, save & quit the message buffer — committed.
-6. `P` to push. `q` to leave lazygit.
+6. `P` to push. `q` to return to the dev window.
 
-That's the entire round-trip without ever opening a separate terminal.
+That's the entire round-trip in a single tmux session.
 
 ### 4.5 Floating terminal (optional)
 
@@ -1438,7 +1447,7 @@ between toggles.
 | Run the Java test under the cursor | `<leader>jt` |
 | Restart jdtls | `<leader>Ww` |
 | Organize Go imports | `<leader>lI` (in Go buffers) |
-| Open lazygit | `<leader>gg` |
+| Open lazygit | `Ctrl-a g` (tmux window) |
 | Review all current changes | `<leader>gd` |
 | Select or change languages | `~/Development/dotfiles/scripts/languages.sh` |
 | Check the environment | `:DevHealth` |

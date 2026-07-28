@@ -63,7 +63,6 @@ return {
         { "<leader>ei", desc = "LSP implementations (Trouble)" },
         { "<leader>en", desc = "Next trouble item" },
         { "<leader>ep", desc = "Previous trouble item" },
-        { "<leader>gg", desc = "LazyGit" },
         { "<leader>gd", desc = "Diffview" },
         { "<leader>gh", desc = "Preview hunk" },
         { "<leader>gb", desc = "Line blame" },

@@ -211,9 +211,12 @@ The debugger loads only when a debug keymap or command is used.
 
 Git keymaps are active only inside Git repositories.
 
+Lazygit opens in a dedicated tmux window via `Ctrl-a g` (not inside Neovim).
+Use hunk-level keys below for in-editor work; use `<leader>gd` to review the
+full diff before switching to lazygit to commit.
+
 | Key | Mode | Action |
 |-----|------|--------|
-| `<leader>gg` | n | Open LazyGit (floating terminal) |
 | `<leader>gd` | n | Open Diffview (current changes) |
 | `<leader>gh` | n | Preview hunk |
 | `<leader>gb` | n | Blame current line |

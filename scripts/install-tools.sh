@@ -7,6 +7,10 @@ LANGUAGES_FILE="${LANGUAGES_FILE:-$HOME/.local/share/nvim/languages.local}"
 
 mkdir -p "$TOOLS_DIR" "$BIN_DIR"
 
+# uv tool installs default to ~/.local/bin which may be root-owned on some
+# systems.  Redirect them to our user-writable BIN_DIR (already on PATH).
+export UV_TOOL_BIN_DIR="$BIN_DIR"
+
 log() {
   printf '[install-tools] %s\n' "$*"
 }
@@ -120,25 +124,36 @@ install_brew() {
 install_jdtls() {
   local version="$1"
   local target="$TOOLS_DIR/jdtls-$version"
-  if [[ -d "$target" ]]; then
+  if [[ -d "$target" && -f "$target/jdtls" ]]; then
     log "jdtls $version already installed"
   else
+    rm -rf "$target"
     local tmp
     tmp=$(mktemp -d)
-    # Construct the download URL dynamically from the version
-    local url="https://www.eclipse.org/downloads/download.php?file=/jdtls/milestones/${version}/jdt-language-server-${version}.tar.gz"
+    local base_url="https://download.eclipse.org/jdtls/milestones/${version}"
+    # The tarball filename includes a build timestamp, so fetch it from latest.txt
+    local tarball
+    tarball=$(curl -fsSL "${base_url}/latest.txt" 2>/dev/null | tr -d '[:space:]')
+    if [[ -z "$tarball" ]]; then
+      log "Could not determine jdtls tarball filename for ${version}"
+      rm -rf "$tmp"
+      return 1
+    fi
     log "Downloading jdtls $version..."
-    curl -fsSL "$url" -o "$tmp/jdtls.tar.gz"
-    verify_checksum "$tmp/jdtls.tar.gz" "" || return 1
+    curl -fsSL "${base_url}/${tarball}" -o "$tmp/jdtls.tar.gz"
+    verify_checksum "$tmp/jdtls.tar.gz" "" || { rm -rf "$tmp"; return 1; }
     mkdir -p "$target"
     tar -xzf "$tmp/jdtls.tar.gz" -C "$target" --strip-components=1
     rm -rf "$tmp"
   fi
   rm -f "$TOOLS_DIR/jdtls"
   ln -s "$target" "$TOOLS_DIR/jdtls"
+  # The jdtls launcher may be at bin/jdtls or just jdtls depending on version
+  local launcher="$TOOLS_DIR/jdtls/bin/jdtls"
+  [[ -f "$launcher" ]] || launcher="$TOOLS_DIR/jdtls/jdtls"
   cat > "$BIN_DIR/jdtls" <<EOF
 #!/usr/bin/env bash
-exec "$TOOLS_DIR/jdtls/bin/jdtls" "\$@"
+exec "$launcher" "\$@"
 EOF
   chmod +x "$BIN_DIR/jdtls"
   log "Installed jdtls wrapper -> $BIN_DIR/jdtls"
@@ -173,7 +188,12 @@ install_vsix() {
     local archive="$tmp/$name.vsix"
     log "Downloading $name $version..."
     curl -fsSL "$url" -o "$archive"
-    verify_checksum "$archive" "" || return 1
+    verify_checksum "$archive" "" || { rm -rf "$tmp"; return 1; }
+    # Marketplace may return gzip-compressed VSIX; decompress if needed
+    if file "$archive" | grep -q gzip; then
+      mv "$archive" "$archive.gz"
+      gunzip "$archive.gz"
+    fi
     mkdir -p "$target"
     unzip -q "$archive" -d "$target"
     rm -rf "$tmp"
@@ -207,12 +227,13 @@ main() {
   # Java — the Java runtime version is managed by mise, while jdtls is
   # a tool that we install separately at a known stable version.
   if has_language "java"; then
-    install_jdtls "1.40.0"
-    install_lombok "1.18.34"
-    install_vsix "java-debug" "0.58.0" \
-      "https://github.com/microsoft/vscode-java-debug/releases/download/v\${VERSION}/vscjava.vscode-java-debug-\${VERSION}.vsix"
-    install_vsix "java-test" "0.43.0" \
-      "https://github.com/microsoft/vscode-java-test/releases/download/v\${VERSION}/vscjava.vscode-java-test-\${VERSION}.vsix"
+    install_jdtls "1.44.0"
+    install_lombok "1.18.36"
+    install_vsix "java-debug" "0.59.0" \
+      "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/vscjava/vsextensions/vscode-java-debug/\${VERSION}/vspackage"
+    install_vsix "java-test" "0.46.0" \
+      "https://marketplace.visualstudio.com/_apis/public/gallery/publishers/vscjava/vsextensions/vscode-java-test/\${VERSION}/vspackage"
+    install_brew "maven"
   fi
 
   # TypeScript / JavaScript

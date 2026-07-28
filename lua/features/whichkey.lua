@@ -135,35 +135,35 @@ return {
         {
           "<leader>Wb",
           function()
-            require("languages.java-commands").build_workspace()
+            require("languages.lib.java-commands").build_workspace()
           end,
           desc = "Build workspace",
         },
         {
           "<leader>Wr",
           function()
-            require("languages.java-commands").reload_workspace()
+            require("languages.lib.java-commands").reload_workspace()
           end,
           desc = "Reload workspace",
         },
         {
           "<leader>Ww",
           function()
-            require("languages.java-commands").restart_jdtls()
+            require("languages.lib.java-commands").restart_jdtls()
           end,
           desc = "Restart jdtls",
         },
         {
           "<leader>Wc",
           function()
-            require("languages.java-commands").clear_workspace_cache()
+            require("languages.lib.java-commands").clear_workspace_cache()
           end,
           desc = "Clear workspace cache",
         },
         {
           "<leader>Wl",
           function()
-            require("languages.java-commands").open_workspace_logs()
+            require("languages.lib.java-commands").open_workspace_logs()
           end,
           desc = "Open workspace logs",
         },

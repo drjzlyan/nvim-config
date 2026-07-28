@@ -2,7 +2,7 @@ local M = {}
 
 local project = require("util.project")
 local java_util = require("util.java")
-local java_project = require("languages.java-project")
+local java_project = require("languages.lib.java-project")
 
 local function jdtls_client(bufnr)
   return vim.lsp.get_clients({ bufnr = bufnr or 0, name = "jdtls" })[1]

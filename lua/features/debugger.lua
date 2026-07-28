@@ -113,9 +113,9 @@ return {
         local ft = vim.bo.filetype
         local ok, adapter
         if ft == "python" then
-          ok, adapter = pcall(require, "languages.python-debug")
+          ok, adapter = pcall(require, "languages.lib.python-debug")
         elseif ft == "java" then
-          ok, adapter = pcall(require, "languages.java-debug")
+          ok, adapter = pcall(require, "languages.lib.java-debug")
         end
         if ok and adapter and adapter.setup then
           adapter.setup()
@@ -129,7 +129,7 @@ return {
         group = augroup,
         pattern = "python",
         callback = function()
-          local ok, adapter = pcall(require, "languages.python-debug")
+          local ok, adapter = pcall(require, "languages.lib.python-debug")
           if ok and adapter and adapter.setup then
             adapter.setup()
           end
@@ -139,7 +139,7 @@ return {
         group = augroup,
         pattern = "java",
         callback = function()
-          local ok, adapter = pcall(require, "languages.java-debug")
+          local ok, adapter = pcall(require, "languages.lib.java-debug")
           if ok and adapter and adapter.setup then
             adapter.setup()
           end

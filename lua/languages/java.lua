@@ -1,8 +1,8 @@
 local project = require("util.project")
 local java_util = require("util.java")
-local java_commands = require("languages.java-commands")
-local java_project = require("languages.java-project")
-local java_testing = require("languages.java-testing")
+local java_commands = require("languages.lib.java-commands")
+local java_project = require("languages.lib.java-project")
+local java_testing = require("languages.lib.java-testing")
 
 local java_augroup = vim.api.nvim_create_augroup("JavaDev", { clear = true })
 
@@ -20,7 +20,7 @@ local function jdtls_config(bufnr)
     capabilities = capabilities,
     single_file_support = true,
     init_options = {
-      bundles = require("languages.java-debug").bundles(),
+      bundles = require("languages.lib.java-debug").bundles(),
     },
     settings = {
       java = {

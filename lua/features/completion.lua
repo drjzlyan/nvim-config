@@ -1,6 +1,9 @@
 return {
   {
     "saghen/blink.cmp",
+    build = function()
+      require("blink.cmp").build():wait()
+    end,
     event = { "InsertEnter", "CmdlineEnter" },
     dependencies = {
       "saghen/blink.lib",

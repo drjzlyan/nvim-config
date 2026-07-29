@@ -283,7 +283,7 @@ Workspace keymaps are Java-specific and manage the jdtls workspace.
 
 | Key | Action |
 |-----|--------|
-| `<leader>t` | Toggle floating terminal |
+| `<leader>t` | Focus tmux build/test pane (floating terminal outside tmux) |
 
 ## Make / Tasks (`<leader>m`)
 

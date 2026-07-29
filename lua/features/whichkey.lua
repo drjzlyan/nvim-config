@@ -17,7 +17,7 @@ return {
         { "<leader>g", group = "Git" },
         { "<leader>d", group = "Debug" },
         { "<leader>l", group = "LSP" },
-        { "<leader>t", desc = "Toggle terminal" },
+        { "<leader>t", desc = "Terminal (tmux pane / float)" },
         { "<leader>m", group = "Make/Tasks" },
         { "<leader>q", group = "Session" },
         { "<leader>j", group = "Java" },

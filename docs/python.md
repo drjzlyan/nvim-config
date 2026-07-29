@@ -132,7 +132,8 @@ Three test commands are provided:
   constructed automatically.
 - `<leader>ptp` — run the full project test suite.
 
-No test UI plugins are used; tests run in a split terminal buffer.
+No test UI plugins are used; tests run in the tmux build/test pane (or a
+floating terminal outside tmux).
 
 ## Formatting and imports on save
 

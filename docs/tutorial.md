@@ -744,7 +744,7 @@ All Python keymaps are under `<leader>p` and active only in Python buffers.
 Try it:
 
 1. Open `tests/test_calc.py`, put the cursor inside `test_add`, press
-   `<leader>ptf` — only that test runs in a split terminal.
+   `<leader>ptf` — only that test runs in the tmux build/test pane.
 2. Press `<leader>pt` — the whole file's tests run.
 3. Press `<leader>ptp` — the full project test suite runs.
 4. Open `src/calc.py` and press `<leader>pr` to run the module.
@@ -758,7 +758,7 @@ provider automatically:
 | `<leader>mc` | Clean build artifacts (removes all `__pycache__` dirs) |
 | `<leader>mp` | Run the current project as a module |
 
-No test-UI plugin is used; output goes to a split terminal buffer.
+No test-UI plugin is used; output goes to the tmux build/test pane.
 
 ### 2.6 Debug with DAP
 
@@ -1100,7 +1100,7 @@ Use the generic task provider from inside Neovim:
 | Build project | `<leader>mb` → `npm run build` |
 | Run tests | `<leader>ms` → `npm test` |
 | Start project | `<leader>mp` → `npm start` |
-| Run current file directly | `<leader>t` → floating terminal → `node src/index.ts` |
+| Run current file directly | `<leader>t` → build/test pane → `node src/index.ts` |
 | Clean | `<leader>mc` → removes `node_modules/`, `dist/`, `build/` |
 
 ### 3b.6 Navigate and refactor
@@ -1564,11 +1564,11 @@ A complete session:
 
 That's the entire round-trip in a single tmux session.
 
-### 4.5 Floating terminal (optional)
+### 4.5 Terminal (build/test pane)
 
-`<leader>t` opens a floating terminal via `toggleterm.nvim` for raw `git`
-commands or any other shell work. Toggle it again to hide it — it persists
-between toggles.
+`<leader>t` jumps to the tmux `build/test` pane for raw `git` commands or any
+other shell work. Outside tmux it toggles a floating terminal via
+`toggleterm.nvim` instead.
 
 ---
 

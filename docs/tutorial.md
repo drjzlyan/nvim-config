@@ -1004,12 +1004,12 @@ You have now built, navigated, refactored, tested, and debugged Java.
 
 ---
 
-## Part 3b — TypeScript / JavaScript tutorial
+## Part 4 — TypeScript / JavaScript tutorial
 
 Goal: create a Node.js project, get LSP + formatting, run and build with the
 task provider — all inside the IDE.
 
-### 3b.1 Create the project
+### 4.1 Create the project
 
 Use `project-init` to scaffold a TypeScript project with the correct ESM
 configuration, `tsconfig.json`, and Node.js built-in test runner:
@@ -1036,7 +1036,7 @@ npm dependencies are installed automatically. Open the project:
 nvim src/index.ts
 ```
 
-### 3b.2 Write code
+### 4.2 Write code
 
 Replace the scaffolded content in `src/index.ts`:
 
@@ -1054,9 +1054,9 @@ export function divide(a: number, b: number): number {
 ```
 
 `typescript-language-server` attaches automatically when a `.ts` file opens
-(root detection: `tsconfig.json` or `package.json`).
+(root detection: `tsconfig.json`, `package.json`, or `.git`).
 
-### 3b.3 Add a test
+### 4.3 Add a test
 
 ```vim
 :e test/index.test.ts
@@ -1078,14 +1078,13 @@ describe("calc", () => {
 });
 ```
 
-### 3b.4 Save and format
+### 4.4 Save and format
 
-Write with `:w`. Format on save uses the TypeScript language server (ts_ls) —
-it formats using ts_ls's built-in formatter in both cases. If `prettier` is
-detected on `$PATH`, the same ts_ls client is used (prefer-ts_ls mode). Manual
-format: `<leader>lf`.
+Write with `:w`. Format on save runs through the TypeScript language
+server (ts_ls); when `prettier` is on `$PATH` the format request is filtered
+to the ts_ls client. Manual format: `<leader>lf`.
 
-### 3b.5 Run and build
+### 4.5 Run and build
 
 Build first (compiles TypeScript to `dist/`):
 
@@ -1103,13 +1102,13 @@ Use the generic task provider from inside Neovim:
 | Run current file directly | `<leader>t` → build/test pane → `node src/index.ts` |
 | Clean | `<leader>mc` → removes `node_modules/`, `dist/`, `build/` |
 
-### 3b.6 Navigate and refactor
+### 4.6 Navigate and refactor
 
 Use the shared LSP keys: `gd` (definition), `gr` (references), `gi`
 (implementation), `K` (hover), `<leader>la` (code action), `<leader>lr`
 (rename). These work identically to Python and Java.
 
-### 3b.7 tmux workflow
+### 4.7 tmux workflow
 
 Start a `dev` session for the TypeScript project:
 
@@ -1125,12 +1124,12 @@ You have now built and tested TypeScript.
 
 ---
 
-## Part 3c — Go tutorial
+## Part 5 — Go tutorial
 
 Goal: create a Go module, get `gopls` + format-on-save, run and test with the
 task provider, and use the tmux dev session.
 
-### 3c.1 Create the module
+### 5.1 Create the module
 
 Use `project-init` to scaffold a Go module with the standard `cmd/` layout:
 
@@ -1149,7 +1148,7 @@ mkdir calc-go && cd calc-go
 go mod init example.com/calc
 ```
 
-### 3c.2 Write code
+### 5.2 Write code
 
 ```bash
 nvim calc.go
@@ -1176,7 +1175,7 @@ Save with `:w` — on every save, `BufWritePre` first requests
 `gopls` LSP formatting (equivalent to `gofmt`). Both steps run through `gopls`,
 not as standalone tools.
 
-### 3c.3 Add a test
+### 5.3 Add a test
 
 ```vim
 :e calc_test.go
@@ -1199,7 +1198,7 @@ func TestDivideByZero(t *testing.T) {
 }
 ```
 
-### 3c.4 Run and test
+### 5.4 Run and test
 
 | Action | Key |
 |--------|-----|
@@ -1209,13 +1208,13 @@ func TestDivideByZero(t *testing.T) {
 | Clean cache | `<leader>mc` → `go clean -cache` |
 | Organize imports manually | `<leader>lI` (in Go buffers) |
 
-### 3c.5 Navigate
+### 5.5 Navigate
 
 `gopls` provides `gd`, `gr`, `gi`, `gt`, `K`, `<leader>la`, `<leader>lr` —
 the same shared LSP keys. Staticcheck and nilness analyses are enabled
 automatically.
 
-### 3c.6 Debug with DAP (Delve)
+### 5.6 Debug with DAP (Delve)
 
 Go debugging uses the Delve DAP adapter. It loads automatically via a
 `FileType go` autocommand — no extra setup once `dlv` is on `$PATH`.
@@ -1235,10 +1234,10 @@ Go debugging uses the Delve DAP adapter. It loads automatically via a
 
 The same `<leader>d*` keymaps work identically in Python, Java, and Go.
 
-### 3c.7 tmux workflow
+### 5.7 tmux workflow
 
 ```bash
-dev calc-go
+dev calc
 ```
 
 Run `go test ./...` in the build/test pane (`Ctrl-a j`), review failures, fix
@@ -1248,12 +1247,12 @@ You have now built, tested, and debugged Go.
 
 ---
 
-## Part 3d — C / C++ tutorial
+## Part 6 — C / C++ tutorial
 
 Goal: create a CMake project, get `clangd` with clang-tidy, build with CMake,
 and format with clang-format.
 
-### 3d.1 Create the project
+### 6.1 Create the project
 
 Use `project-init` to scaffold a C++ project with CMake already configured:
 
@@ -1277,19 +1276,21 @@ nvim CMakeLists.txt
 ```cmake
 cmake_minimum_required(VERSION 3.20)
 project(calc CXX)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
+
+add_executable(calc src/main.cpp src/calc.cpp)
+target_include_directories(calc PRIVATE src)
 
 enable_testing()
-
-add_executable(calc src/calc.cpp src/calc_test.cpp)
-target_include_directories(calc PRIVATE src)
-add_test(NAME calc_test COMMAND calc)
+add_executable(calc_test tests/test_main.cpp src/calc.cpp)
+target_include_directories(calc_test PRIVATE src)
+add_test(NAME calc_test COMMAND calc_test)
 ```
 
-### 3d.2 Write code
+### 6.2 Write code
 
 ```bash
-nvim src/calc.cpp
+nvim src/calc.hpp
 ```
 
 ```cpp
@@ -1305,6 +1306,8 @@ double divide(int a, int b);
 
 ```cpp
 #include "calc.hpp"
+
+#include <stdexcept>
 
 int add(int a, int b) {
     return a + b;
@@ -1322,7 +1325,7 @@ double divide(int a, int b) {
 `compile_commands.json` or `CMakeLists.txt`). It uses background indexing,
 clang-tidy, and header insertion (iwyu style).
 
-### 3d.3 Generate compile_commands.json
+### 6.3 Generate compile_commands.json
 
 ```bash
 cd build
@@ -1332,7 +1335,7 @@ cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
 Restart Neovim or reopen the file — `clangd` picks up
 `compile_commands.json` and provides accurate diagnostics.
 
-### 3d.4 Build and test
+### 6.4 Build and test
 
 ```bash
 cd build && cmake --build . && ctest --output-on-failure
@@ -1346,12 +1349,12 @@ Or from inside Neovim via the task provider:
 | Run tests | `<leader>ms` → `ctest --output-on-failure` |
 | Clean | `<leader>mc` → `rm -rf build` |
 
-### 3d.5 Format
+### 6.5 Format
 
 Save with `:w` — `clang-format` formats automatically. Manual format:
 `<leader>lf`. The fallback style is LLVM.
 
-### 3d.6 Navigate
+### 6.6 Navigate
 
 `clangd` provides `gd`, `gr`, `gi`, `gt`, `K`, `<leader>la`, `<leader>lr`.
 Completion shows function argument placeholders.
@@ -1360,12 +1363,12 @@ You have now built and tested C/C++.
 
 ---
 
-## Part 3e — Rust tutorial
+## Part 7 — Rust tutorial
 
 Goal: create a Cargo project, get `rust-analyzer` with clippy + inlay hints,
 build, test, and run with the task provider.
 
-### 3e.1 Create the project
+### 7.1 Create the project
 
 Use `project-init` to scaffold a Rust project (runs `cargo init` internally):
 
@@ -1382,7 +1385,7 @@ cargo new calc-rs
 cd calc-rs
 ```
 
-### 3e.2 Write code
+### 7.2 Write code
 
 ```bash
 nvim src/main.rs
@@ -1409,13 +1412,9 @@ fn main() {
 It enables all cargo features, clippy on save, proc macro support, and inlay
 hints (type hints, parameter hints, chaining hints).
 
-### 3e.3 Add a test
+### 7.3 Add a test
 
-```vim
-:e src/lib.rs
-```
-
-Actually, put tests in the same file:
+Append a test module to `src/main.rs`:
 
 ```rust
 #[cfg(test)]
@@ -1435,12 +1434,12 @@ mod tests {
 }
 ```
 
-### 3e.4 Save and format
+### 7.4 Save and format
 
 Save with `:w` — `rustfmt` formats via `rust-analyzer`. Inlay hints show
 parameter types and names inline. Clippy warnings appear as diagnostics.
 
-### 3e.5 Build, test, and run
+### 7.5 Build, test, and run
 
 | Action | Key |
 |--------|-----|
@@ -1449,13 +1448,13 @@ parameter types and names inline. Clippy warnings appear as diagnostics.
 | Run project | `<leader>mp` → `cargo run` |
 | Clean | `<leader>mc` → `cargo clean` |
 
-### 3e.6 Navigate
+### 7.6 Navigate
 
 `rust-analyzer` provides `gd`, `gr`, `gi`, `gt`, `K`, `<leader>la`,
 `<leader>lr` — the same shared LSP keys. Macro expansions are decoded so
 you can navigate into generated code.
 
-### 3e.7 tmux workflow
+### 7.7 tmux workflow
 
 ```bash
 dev calc-rs
@@ -1468,12 +1467,12 @@ You have now built and tested Rust.
 
 ---
 
-## Part 4 — Git and lazygit
+## Part 8 — Git and lazygit
 
 Git tooling lazy-loads only inside Git repositories, so the `<leader>g` mappings
 appear automatically when you need them.
 
-### 4.1 Initialize a repo (if your project isn't one yet)
+### 8.1 Initialize a repo (if your project isn't one yet)
 
 ```bash
 cd ~/ide-tutorial/calc   # or calc-java
@@ -1482,7 +1481,7 @@ git add -A
 git commit -m "Initial commit"
 ```
 
-### 4.2 Hunk-level work with gitsigns
+### 8.2 Hunk-level work with gitsigns
 
 `gitsigns.nvim` shows hunk signs in the gutter and current-line blame (300 ms
 delay). These keys work in any buffer:
@@ -1501,7 +1500,7 @@ A typical loop: edit a file, `<leader>gn` to hop through changed hunks,
 `<leader>gh` to review each one, `<leader>gs` to stage the ones you want,
 `<leader>gr` to discard a bad change.
 
-### 4.3 Review changes with diffview
+### 8.3 Review changes with diffview
 
 | Key / Command | Action |
 |-----|--------|
@@ -1514,7 +1513,7 @@ A typical loop: edit a file, `<leader>gn` to hop through changed hunks,
 `<leader>gd` is the quickest way to review everything you've changed before
 committing.
 
-### 4.4 lazygit — the main event
+### 8.4 lazygit — the main event
 
 Open it with `Ctrl-a g`. It opens in a dedicated tmux window named `git`. If the
 window is already open, tmux switches to it instead of creating a duplicate. Close
@@ -1564,7 +1563,7 @@ A complete session:
 
 That's the entire round-trip in a single tmux session.
 
-### 4.5 Terminal (build/test pane)
+### 8.5 Terminal (build/test pane)
 
 `<leader>t` jumps to the tmux `build/test` pane for raw `git` commands or any
 other shell work. Outside tmux it toggles a floating terminal via

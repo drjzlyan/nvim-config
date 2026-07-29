@@ -51,22 +51,24 @@ Every tmux command starts with the prefix.
 | `Ctrl-a d` | Detach from session (session keeps running) |
 | `Ctrl-a s` | Interactive session switcher |
 | `Ctrl-a $` | Rename current session |
-| `Ctrl-a Q` | Kill the current session (dotfiles binding) |
+| `Ctrl-a Q` | Kill the current session (dotfiles custom binding) |
 | `tmux ls` | List sessions from the shell |
 | `tmux attach -t <name>` | Reattach to a detached session |
 
 #### Window management
 
+Bindings marked *(default)* are standard tmux built-ins, not custom dotfiles bindings — they work unless you have overridden them.
+
 | Key | Action |
 |-----|--------|
 | `Ctrl-a c` | Create a new window |
-| `Ctrl-a n` | Next window |
-| `Ctrl-a p` | Previous window |
-| `Ctrl-a 1`–`9` | Jump to window by number |
-| `Ctrl-a ,` | Rename current window |
-| `Ctrl-a &` | Close current window (confirm) |
-| `Ctrl-a g` | Open lazygit (reuses existing window or creates one) |
-| `Ctrl-a P` | Start a new project session (dotfiles binding) |
+| `Ctrl-a n` | Next window *(default)* |
+| `Ctrl-a p` | Previous window *(default)* |
+| `Ctrl-a 1`–`9` | Jump to window by number *(default)* |
+| `Ctrl-a ,` | Rename current window *(default)* |
+| `Ctrl-a &` | Close current window (confirm) *(default)* |
+| `Ctrl-a g` | Open lazygit (reuses existing window or creates one) — dotfiles custom |
+| `Ctrl-a P` | Create a new project (prompts for `language:name`) — dotfiles custom |
 
 #### Pane navigation and management
 
@@ -109,7 +111,7 @@ Neovim is modal: what a key does depends on which mode you are in.
 
 | Mode | How to enter | What it does |
 |------|-------------|--------------|
-| **Normal** | `Esc` (or `jk` in insert) | Navigation and commands — the default |
+| **Normal** | `Esc` | Navigation and commands — the default |
 | **Insert** | `i`, `a`, `o`, `O`, `s`, `c…` | Type text |
 | **Visual** | `v` | Select characters |
 | **Visual-Line** | `V` | Select whole lines |
@@ -122,7 +124,7 @@ Quick mode transitions:
 Normal  →  Insert:    i  (before cursor)   a  (after cursor)
 Normal  →  Insert:    o  (new line below)  O  (new line above)
 Normal  →  Visual:    v  (char)  V  (line)  Ctrl-v  (block)
-Insert  →  Normal:    Esc  (or jk — dotfiles maps this)
+Insert  →  Normal:    Esc
 ```
 
 ---
@@ -351,6 +353,17 @@ Restart your terminal (or `source ~/.zshrc`) so the new prompt and `$PATH` apply
 
 ### 1.2 Install the editor configuration
 
+If you ran `install.sh` in Part 1.1, nvim-config is already cloned to
+`~/nvim-config` (a sibling of the dotfiles directory) and `link.sh` has already
+created the symlink `~/.config/nvim → ~/nvim-config`. Just open Neovim:
+
+```bash
+nvim
+```
+
+If you skipped the dotfiles bootstrap and want the editor config standalone,
+clone it directly:
+
 ```bash
 git clone git@github.com:drjzlyan/nvim-config.git ~/.config/nvim
 nvim
@@ -493,11 +506,11 @@ Editing essentials:
 
 | Key | Mode | Action |
 |-----|------|--------|
-| `gcc` | n | Toggle line comment |
-| `gc` | n/v | Toggle comment over motion/selection |
-| `sa{` | n/v | Add surround (e.g. `sa(` wraps in parens) |
-| `sd{` | n | Delete a surrounding pair |
-| `sr({` | n | Replace surround `(` with `{` |
+| `gcc` | n | Toggle line comment (Neovim 0.10+ built-in operator) |
+| `gc` | n/v | Toggle comment over motion/selection (built-in) |
+| `sa{` | n/v | Add surround (e.g. `sa(` wraps in parens) — mini.surround |
+| `sd{` | n | Delete a surrounding pair — mini.surround |
+| `sr({` | n | Replace surround `(` with `{` — mini.surround |
 | `gnn` / `grn` / `grm` / `grc` | n | Treesitter: init / grow node / grow scope / shrink |
 
 Treesitter text objects (usable with any operator, e.g. `daf` = delete around function):
@@ -605,11 +618,15 @@ From inside nvim, use `<leader>gd` to review a full diff before committing, and
 hunk-level `<leader>g*` keys (stage, reset, preview) for in-editor work. For
 commits, push, pull, and branching, switch to the lazygit window with `Ctrl-a g`.
 
-**Checking agent status** from the command line:
+**Checking agent status** from the command line (must be inside a tmux session):
 
 ```bash
-ide-agent status   # show current agent and available agents
+ide-agent status        # show current agent, available agents, and saved pref
+ide-agent prefs         # show all saved per-project preferences
+ide-agent clear-pref    # remove saved preference for the current project
 ```
+
+All `ide-agent` subcommands exit with "Not in a tmux session" if run outside tmux.
 
 You are ready. Quit with `<leader>Z` and move on.
 
@@ -620,15 +637,22 @@ You are ready. Quit with `<leader>Z` and move on.
 Goal: create a small Python project, write a function + a test, get LSP +
 formatting on save, run the tests from inside Neovim, and debug it with DAP.
 
-### 2.1 Create the project with `uv`
+### 2.1 Create the project
+
+You can use `project-init` to scaffold a Python project with the correct layout,
+then add debugging support:
 
 ```bash
 cd ~/ide-tutorial
-uv init calc
+project-init python calc
 cd calc
 uv venv                       # creates .venv (auto-detected by Neovim)
-uv add --dev pytest debugpy
+uv add --dev debugpy           # needed for DAP debugging (Part 2.6)
 ```
+
+The scaffold already includes `pytest` and `ruff` as dev dependencies in
+`pyproject.toml`. `debugpy` is added manually since it is only needed for
+debugging sessions and is not included in the default scaffold.
 
 `uv` is the preferred runner. When it is on `$PATH`, every run/test command inside
 Neovim uses `uv run python …` so the project interpreter is picked automatically.
@@ -636,11 +660,13 @@ If `uv` is absent the config falls back to the detected venv or `python3`.
 
 ### 2.2 Open the project and write code
 
+The scaffold creates `src/calc/main.py`. Add the calculator functions there:
+
 ```bash
-nvim src/calc.py
+nvim src/calc/main.py
 ```
 
-Type:
+Replace the generated content:
 
 ```python
 def add(a: int, b: int) -> int:
@@ -651,6 +677,14 @@ def divide(a: int, b: int) -> float:
     if b == 0:
         raise ValueError("b must not be zero")
     return a / b
+
+
+def main() -> None:
+    print(add(2, 3))
+
+
+if __name__ == "__main__":
+    main()
 ```
 
 `basedpyright` attaches automatically (Python buffer + detected `.venv`). Watch
@@ -659,14 +693,16 @@ organization; it is preferred over basedpyright wherever they overlap.
 
 ### 2.3 Add a test
 
-Create the test file:
+The scaffold already created `tests/test_main.py`. Open and expand it:
 
 ```vim
 :e tests/test_calc.py
 ```
 
+Create `tests/test_calc.py`:
+
 ```python
-from calc import add, divide
+from calc.main import add, divide
 
 import pytest
 
@@ -773,13 +809,25 @@ brew install openjdk@8 openjdk@11 openjdk@17 jdtls lombok \
 ```
 
 For test **debugging** you also need the `java-debug` and `java-test` extension
-bundles; add their JARs to the folders searched by `lua/languages/java-debug.lua`
+bundles; add their JARs to the folders searched by `lua/languages/lib/java-debug.lua`
 (or adjust the glob patterns there).
 
 ### 3.2 Create a Maven project
 
+Use `project-init` to scaffold a Maven project with JUnit 5 already configured:
+
 ```bash
 cd ~/ide-tutorial
+project-init java com.example.calc
+cd calc
+nvim
+```
+
+The scaffold creates a standard Maven layout (`src/main/java/`, `src/test/java/`),
+a `pom.xml` targeting Java 17 with JUnit 5, and a starter main class and test.
+Alternatively, generate one manually:
+
+```bash
 mvn -B archetype:generate \
   -DarchetypeGroupId=org.apache.maven.archetypes \
   -DarchetypeArtifactId=maven-archetype-quickstart \
@@ -895,10 +943,17 @@ or `settings.gradle.kts` (searching upward from the current file).
 
 | Key | Maven | Gradle |
 |-----|-------|--------|
-| `<leader>jc` | `mvn compile` | `gradle classes` |
+| `<leader>jc` | `mvn compile` | `gradle build` |
 | `<leader>jp` | `mvn package` | `gradle assemble` |
 | `<leader>jv` | `mvn verify` | `gradle check` |
-| (`:JavaX` test/clean/install) | `mvn test` / `mvn clean` / `mvn install` | `gradle test` / `gradle clean` / `gradle publishToMavenLocal` |
+
+The generic task provider also dispatches to the build system via `<leader>m*`:
+
+| Key | Maven | Gradle |
+|-----|-------|--------|
+| `<leader>ms` | `mvn test` | `gradle test` |
+| `<leader>mc` | `mvn clean` | `gradle clean` |
+| `<leader>mp` | `mvn install` | `gradle publishToMavenLocal` |
 
 Press `<leader>jc` to compile. Build output dirs (`target/`, `build/`, `.gradle/`,
 `.idea/`) are excluded from wild searches via `wildignore`.
@@ -956,19 +1011,34 @@ task provider — all inside the IDE.
 
 ### 3b.1 Create the project
 
+Use `project-init` to scaffold a TypeScript project with the correct ESM
+configuration, `tsconfig.json`, and Node.js built-in test runner:
+
 ```bash
 cd ~/ide-tutorial
-mkdir calc-ts && cd calc-ts
-npm init -y
-npm install --save-dev typescript @types/node
-npx tsc --init
+project-init typescript calc-ts
+cd calc-ts
+```
+
+This creates:
+
+```
+calc-ts/
+├── package.json      (type: "module", build/test scripts)
+├── tsconfig.json     (ES2022, strict)
+├── src/index.ts      (main entry point)
+└── test/index.test.ts (Node.js built-in test runner)
+```
+
+npm dependencies are installed automatically. Open the project:
+
+```bash
+nvim src/index.ts
 ```
 
 ### 3b.2 Write code
 
-```bash
-nvim src/calc.ts
-```
+Replace the scaffolded content in `src/index.ts`:
 
 ```typescript
 export function add(a: number, b: number): number {
@@ -989,36 +1059,48 @@ export function divide(a: number, b: number): number {
 ### 3b.3 Add a test
 
 ```vim
-:e src/calc.test.ts
+:e test/index.test.ts
 ```
 
 ```typescript
-import { add, divide } from "./calc";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { add, divide } from "../src/index.js";
 
-test("add", () => {
-  expect(add(2, 3)).toBe(5);
-});
+describe("calc", () => {
+  it("adds two numbers", () => {
+    assert.equal(add(2, 3), 5);
+  });
 
-test("divide by zero", () => {
-  expect(() => divide(1, 0)).toThrow("b must not be zero");
+  it("throws on divide by zero", () => {
+    assert.throws(() => divide(1, 0), /b must not be zero/);
+  });
 });
 ```
 
 ### 3b.4 Save and format
 
-Write with `:w`. Format on save runs `prettier` for `.ts`, `.tsx`, `.js`, `.jsx`
-files. Manual format: `<leader>lf`.
+Write with `:w`. Format on save uses the TypeScript language server (ts_ls) —
+it formats using ts_ls's built-in formatter in both cases. If `prettier` is
+detected on `$PATH`, the same ts_ls client is used (prefer-ts_ls mode). Manual
+format: `<leader>lf`.
 
 ### 3b.5 Run and build
 
-Use the generic task provider (`<leader>t` group) or run directly:
+Build first (compiles TypeScript to `dist/`):
 
-| Action | Command / Key |
-|--------|-------------|
-| Run current file | `:node %` or the terminal (`<leader>t`) |
+```bash
+npm run build    # or <leader>mb inside Neovim
+```
+
+Use the generic task provider from inside Neovim:
+
+| Action | Key |
+|--------|-----|
 | Build project | `<leader>mb` → `npm run build` |
 | Run tests | `<leader>ms` → `npm test` |
 | Start project | `<leader>mp` → `npm start` |
+| Run current file directly | `<leader>t` → floating terminal → `node src/index.ts` |
 | Clean | `<leader>mc` → removes `node_modules/`, `dist/`, `build/` |
 
 ### 3b.6 Navigate and refactor
@@ -1029,15 +1111,15 @@ Use the shared LSP keys: `gd` (definition), `gr` (references), `gi`
 
 ### 3b.7 tmux workflow
 
-Start a `dev` session for a TypeScript project:
+Start a `dev` session for the TypeScript project:
 
 ```bash
 dev calc-ts
 ```
 
-This opens a 3-pane layout (nvim | agent / build-test).
-Run `npm run build` in the bottom-right pane, jump there with `Ctrl-a j`,
-jump back to nvim with `Ctrl-a h` (vi-style tmux navigation).
+This opens a 3-pane layout (nvim | agent | build-test). Run `npm run build`
+in the build/test pane (`Ctrl-a j`), then `npm test` to run the Node.js tests.
+Jump back to nvim with `Ctrl-a h`.
 
 You have now built and tested TypeScript.
 
@@ -1050,8 +1132,19 @@ task provider, and use the tmux dev session.
 
 ### 3c.1 Create the module
 
+Use `project-init` to scaffold a Go module with the standard `cmd/` layout:
+
 ```bash
 cd ~/ide-tutorial
+project-init go example.com/calc
+cd calc
+nvim cmd/calc/main.go
+```
+
+The scaffold runs `go mod init example.com/calc` and creates
+`cmd/calc/main.go`. Alternatively, create it manually:
+
+```bash
 mkdir calc-go && cd calc-go
 go mod init example.com/calc
 ```
@@ -1078,7 +1171,10 @@ func Divide(a, b int) float64 {
 ```
 
 `gopls` attaches on `FileType go` (root detection: `go.mod` or `go.work`).
-Save with `:w` — `goimports` organizes imports, then `gofmt` formats the buffer.
+Save with `:w` — on every save, `BufWritePre` first requests
+`source.organizeImports` from `gopls` (equivalent to `goimports`), then calls
+`gopls` LSP formatting (equivalent to `gofmt`). Both steps run through `gopls`,
+not as standalone tools.
 
 ### 3c.3 Add a test
 
@@ -1127,11 +1223,11 @@ Go debugging uses the Delve DAP adapter. It loads automatically via a
 1. Put the cursor on `return a + b` inside `Add`, press `<leader>db` to set a
    breakpoint.
 2. Press `<leader>dc` — a picker shows four configurations:
-   - **Debug current file**
-   - **Debug package**
+   - **Debug file** — runs `dlv debug` on the file in the active buffer.
+   - **Debug package** — runs `dlv debug` on the current package directory.
    - **Debug test** — runs `dlv test` on the current package.
-   - **Attach to process** — prompts for a PID.
-   Pick **Debug current file** for now.
+   - **Attach to process** — prompts for a PID to attach to a running process.
+   Pick **Debug file** for now.
 3. The DAP UI opens: scopes, breakpoints, call stack, REPL, console.
    `nvim-dap-virtual-text` shows variable values inline.
 4. Step with `<leader>do` (over), `<leader>di` (into), `<leader>dO` (out).
@@ -1159,15 +1255,22 @@ and format with clang-format.
 
 ### 3d.1 Create the project
 
+Use `project-init` to scaffold a C++ project with CMake already configured:
+
 ```bash
 cd ~/ide-tutorial
-mkdir calc-cpp && cd calc-cpp
+project-init cpp calc-cpp
+cd calc-cpp
 mkdir build
+nvim src/main.cpp
 ```
 
-Create `CMakeLists.txt`:
+The scaffold creates `CMakeLists.txt` (C++20, with test target), `src/main.cpp`,
+and `tests/test_main.cpp`. Alternatively, create it manually:
 
 ```bash
+mkdir calc-cpp && cd calc-cpp
+mkdir build src tests
 nvim CMakeLists.txt
 ```
 
@@ -1264,8 +1367,17 @@ build, test, and run with the task provider.
 
 ### 3e.1 Create the project
 
+Use `project-init` to scaffold a Rust project (runs `cargo init` internally):
+
 ```bash
 cd ~/ide-tutorial
+project-init rust calc-rs
+cd calc-rs
+```
+
+Or create it manually:
+
+```bash
 cargo new calc-rs
 cd calc-rs
 ```
@@ -1470,6 +1582,9 @@ between toggles.
 | Go to definition / references | `gd` / `gr` |
 | Rename a symbol | `<leader>lr` |
 | Format the current buffer | `<leader>lf` |
+| Create a new project | `project-init <lang> <name>` or `Ctrl-a P` in tmux |
+| Start a dev session | `dev` (or `dev -a claude`) |
+| Switch coding agent | `Ctrl-a A` (interactive) or `Ctrl-a N` (cycle) |
 | Run the current Python file | `<leader>pr` |
 | Run the Python test under the cursor | `<leader>ptf` |
 | Debug (Python, Java, or Go) | `<leader>db` (breakpoint) → `<leader>dc` (start) |
@@ -1481,6 +1596,7 @@ between toggles.
 | Review all current changes | `<leader>gd` |
 | Select or change languages | `~/Development/dotfiles/scripts/languages.sh` |
 | Check the environment | `:DevHealth` |
+| Clear a stale cache | `:DevCleanCache jdtls` / `:DevCleanCache treesitter` |
 
 For the full reference, see the other docs in this folder:
 

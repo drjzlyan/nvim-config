@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Standard per-language keymap groups and user commands for Go (`<leader>o`),
+  Rust (`<leader>r`), C/C++ (`<leader>C`), and TypeScript/JavaScript
+  (`<leader>y`), mirroring the existing Java and Python groups (format,
+  organize imports, refactor, build, run, test, call hierarchy).
+- Test providers for Go (treesitter + `go test -run`, Delve debug), Rust
+  (`cargo test` with mod-path scoping), TypeScript (`node --test` with name
+  patterns), and C/C++ (`ctest`), wired into the generic `<leader>T*` maps.
+- Python registered as a test provider for the generic `<leader>T*` maps,
+  including debugpy-based pytest debugging and a `<leader>ptc` class-scope run.
+
 ## [1.0.0] - 2026-07-27
 
 ### Added

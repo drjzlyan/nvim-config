@@ -99,6 +99,13 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>lI", function()
       organize_imports(bufnr)
     end, { buffer = bufnr, silent = true, desc = "Organize imports (goimports)" })
+    require("util.langmaps").register(bufnr, {
+      lang = "Go",
+      prefix = "<leader>o",
+      format = format_go,
+      organize_imports = organize_imports,
+      debug = true,
+    })
   end,
 })
 
@@ -145,6 +152,11 @@ local go_provider = {
     return { cmd = { "go", "clean", "-cache" }, cwd = project_root() }
   end,
 }
+
+local testing = require("util.testing")
+if testing then
+  testing.register("go", require("languages.lib.go-testing"))
+end
 
 local ok, tasks = pcall(require, "util.tasks")
 if ok and tasks.register_provider then

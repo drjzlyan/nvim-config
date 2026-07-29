@@ -91,6 +91,11 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = "rust",
   callback = function(args)
     setup_lsp()
+    require("util.langmaps").register(args.buf, {
+      lang = "Rust",
+      prefix = "<leader>r",
+      format = format_rust,
+    })
   end,
 })
 
@@ -132,6 +137,11 @@ local rust_provider = {
     return { cmd = { "cargo", "clean" }, cwd = project_root() }
   end,
 }
+
+local testing = require("util.testing")
+if testing then
+  testing.register("rust", require("languages.lib.rust-testing"))
+end
 
 local ok, tasks = pcall(require, "util.tasks")
 if ok and tasks.register_provider then

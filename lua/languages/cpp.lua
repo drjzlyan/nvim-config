@@ -82,6 +82,11 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "c", "cpp", "objc", "objcpp", "cuda" },
   callback = function(args)
     setup_lsp()
+    require("util.langmaps").register(args.buf, {
+      lang = "Cpp",
+      prefix = "<leader>C",
+      format = format_cpp,
+    })
   end,
 })
 
@@ -134,6 +139,11 @@ local cpp_provider = {
     return { cmd = { "rm", "-rf", "build" }, cwd = project_root() }
   end,
 }
+
+local testing = require("util.testing")
+if testing then
+  testing.register("cpp", require("languages.lib.cpp-testing"))
+end
 
 local ok, tasks = pcall(require, "util.tasks")
 if ok and tasks.register_provider then

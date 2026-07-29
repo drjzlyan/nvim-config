@@ -104,6 +104,7 @@ All Python keymaps are under `<leader>p` and only active in Python buffers.
 | `<leader>ps` | v | Run selected code |
 | `<leader>pt` | n | pytest current file |
 | `<leader>ptf` | n | pytest current function / method |
+| `<leader>ptc` | n | pytest current class |
 | `<leader>ptp` | n | pytest whole project |
 | `<leader>pi` | n | Organize imports |
 | `<leader>pf` | n / v | Format with Ruff |
@@ -128,6 +129,7 @@ Three test commands are provided:
 
 - `<leader>pt` — run all tests in the current file.
 - `<leader>ptf` — run only the test function or class method under the cursor.
+- `<leader>ptc` — run the test class under the cursor.
   The node ID is built from treesitter, so `file.py::ClassName::method_name` is
   constructed automatically.
 - `<leader>ptp` — run the full project test suite.

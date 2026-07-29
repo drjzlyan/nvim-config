@@ -240,6 +240,68 @@ local function pytest_project()
   send_to_terminal(cmd, root, "test")
 end
 
+-- Enclosing class name only (for class-scoped pytest runs), or nil.
+local function current_pytest_class()
+  local node = vim.treesitter.get_node()
+  while node do
+    if node:type() == "class_definition" then
+      for child in node:iter_children() do
+        if child:type() == "identifier" then
+          return vim.treesitter.get_node_text(child, 0)
+        end
+      end
+      return nil
+    end
+    node = node:parent()
+  end
+  return nil
+end
+
+local function pytest_class()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == "" then
+    vim.notify("No Python file to test", vim.log.levels.WARN)
+    return
+  end
+  local class_name = current_pytest_class()
+  local target
+  if class_name then
+    target = vim.fn.fnamemodify(file, ":t") .. "::" .. class_name
+  else
+    target = file
+  end
+  local root = project_root(bufnr)
+  local cmd = python_cmd(bufnr)
+  vim.list_extend(cmd, { "-m", "pytest", target })
+  send_to_terminal(cmd, root, "test")
+end
+
+local function debug_pytest(target_fn)
+  local bufnr = vim.api.nvim_get_current_buf()
+  local file = vim.api.nvim_buf_get_name(bufnr)
+  if file == "" then
+    vim.notify("No Python file to debug", vim.log.levels.WARN)
+    return
+  end
+  local ok, dap = pcall(require, "dap")
+  if not ok then
+    vim.notify("nvim-dap is not available", vim.log.levels.ERROR)
+    return
+  end
+  dap.run({
+    type = "python",
+    request = "launch",
+    name = "Debug pytest",
+    module = "pytest",
+    args = { target_fn(bufnr, file) },
+    pythonPath = function()
+      return python_interpreter(bufnr)
+    end,
+    cwd = project_root(bufnr),
+  })
+end
+
 -- ============================================================================
 -- Ruff organize imports
 -- ============================================================================
@@ -298,6 +360,7 @@ local function register_commands(bufnr)
     { "PythonRunSelection", run_selection, { desc = "Run selected Python code", range = true } },
     { "PythonTestFile", pytest_file, { desc = "pytest current file" } },
     { "PythonTestFunction", pytest_function, { desc = "pytest current function/class" } },
+    { "PythonTestClass", pytest_class, { desc = "pytest current class" } },
     { "PythonTestProject", pytest_project, { desc = "pytest whole project" } },
     { "PythonOrganizeImports", organize_imports, { desc = "Organize Python imports" } },
     { "PythonFormat", format_python, { desc = "Format Python with Ruff" } },
@@ -319,6 +382,7 @@ local function register_keymaps(bufnr)
   map("<leader>ps", run_selection, { "v" }, "Run selection")
   map("<leader>pt", pytest_file, { "n" }, "Test file")
   map("<leader>ptf", pytest_function, { "n" }, "Test function")
+  map("<leader>ptc", pytest_class, { "n" }, "Test class")
   map("<leader>ptp", pytest_project, { "n" }, "Test project")
   map("<leader>pi", organize_imports, { "n" }, "Organize imports")
   map("<leader>pf", format_python, { "n", "v" }, "Format")
@@ -500,6 +564,45 @@ local python_provider = {
     }
   end,
 }
+
+local testing = require("util.testing")
+if testing then
+  testing.register("python", {
+    detect = function(bufnr)
+      return vim.bo[bufnr or 0].filetype == "python"
+    end,
+    run_nearest = function()
+      pytest_function()
+    end,
+    run_current_class = function()
+      pytest_class()
+    end,
+    run_package = function()
+      pytest_file()
+    end,
+    run_module = function()
+      pytest_project()
+    end,
+    debug_nearest = function()
+      debug_pytest(function(_, file)
+        local node = current_pytest_node()
+        if node then
+          return vim.fn.fnamemodify(file, ":t") .. "::" .. node
+        end
+        return file
+      end)
+    end,
+    debug_current_class = function()
+      debug_pytest(function(_, file)
+        local class_name = current_pytest_class()
+        if class_name then
+          return vim.fn.fnamemodify(file, ":t") .. "::" .. class_name
+        end
+        return file
+      end)
+    end,
+  })
+end
 
 local ok, tasks = pcall(require, "util.tasks")
 if ok and tasks.register_provider then

@@ -56,6 +56,14 @@ local function format_typescript(bufnr)
   end
 end
 
+-- Organize imports via the ts_ls source action
+local function organize_imports(bufnr)
+  vim.lsp.buf.code_action({
+    context = { only = { "source.organizeImports" } },
+    apply = true,
+  })
+end
+
 local ts_augroup = vim.api.nvim_create_augroup("TypeScriptDev", { clear = true })
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -67,6 +75,12 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.keymap.set("n", "<leader>lf", function()
       format_typescript(bufnr)
     end, { buffer = bufnr, silent = true, desc = "Format (prettier)" })
+    require("util.langmaps").register(bufnr, {
+      lang = "TypeScript",
+      prefix = "<leader>y",
+      format = format_typescript,
+      organize_imports = organize_imports,
+    })
   end,
 })
 
@@ -116,6 +130,11 @@ local ts_provider = {
     return { cmd = { "rm", "-rf", "node_modules", "dist", "build" }, cwd = vim.fn.getcwd() }
   end,
 }
+
+local testing = require("util.testing")
+if testing then
+  testing.register("typescript", require("languages.lib.ts-testing"))
+end
 
 local ok, tasks = pcall(require, "util.tasks")
 if ok and tasks.register_provider then

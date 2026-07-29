@@ -148,6 +148,7 @@ Python keymaps are active only in Python buffers.
 | `<leader>ps` | v | Run selected code |
 | `<leader>pt` | n | pytest current file |
 | `<leader>ptf` | n | pytest current function / method |
+| `<leader>ptc` | n | pytest current class |
 | `<leader>ptp` | n | pytest whole project |
 | `<leader>pi` | n | Organize imports |
 | `<leader>pf` | n / v | Format with Ruff |
@@ -173,30 +174,53 @@ Java keymaps are active only in Java buffers.
 | `<leader>jl` | n | Workspace logs |
 | `<leader>jw` | n | Restart workspace |
 
+Every language below shares the same keymap layout under its own prefix,
+registered buffer-locally by `util/langmaps.lua`:
+
+| Key suffix | Mode | Action |
+|------------|------|--------|
+| `f` | n / v | Format |
+| `i` | n | Organize imports (where the LSP supports it) |
+| `r` | n / v | Refactor menu |
+| `c` | n | Build / compile project |
+| `p` | n | Run project |
+| `R` | n | Run current file |
+| `t` | n | Run nearest test |
+| `T` | n | Run test file / class |
+| `d` / `D` | n | Debug nearest test / test class (Python, Go) |
+| `h` / `H` | n | Incoming / outgoing call hierarchy |
+
+Each action also exists as a user command, e.g. `:GoTestNearest`,
+`:RustRunFile`, `:CppBuild`, `:TypeScriptOrganizeImports`.
+
 ## TypeScript / JavaScript
 
-No dedicated keymaps; use the shared LSP keys (`gd`, `gr`, `K`, `<leader>la`,
-`<leader>lr`, `<leader>lf`). Format on save runs automatically via `prettier`.
+Active in TypeScript / JavaScript buffers under the `<leader>y` prefix
+(e.g. `<leader>yt` runs the nearest `node:test` case, `<leader>yi` organizes
+imports via `ts_ls`). Format on save runs automatically via `ts_ls`.
 
 ## Go
 
-Go keymaps are active only in Go buffers.
+Active in Go buffers under the `<leader>o` prefix (e.g. `<leader>ot` runs the
+nearest test via `go test -run`, `<leader>od` debugs it via Delve).
+Additionally:
 
 | Key | Mode | Action |
 |-----|------|--------|
 | `<leader>lI` | n | Organize imports (goimports) |
 
-Format on save runs `goimports` + `gofmt` automatically via `gopls`. Use
-`<leader>lf` for manual formatting.
+Format on save runs `goimports` + `gofmt` automatically via `gopls`.
 
 ## C / C++
 
-No dedicated keymaps; use the shared LSP keys. Format on save runs
-`clang-format` automatically via `clangd`.
+Active in C / C++ buffers under the `<leader>C` prefix. Test maps run the
+configured `ctest` suite in `build/`. Format on save runs `clang-format`
+automatically via `clangd`.
 
 ## Rust
 
-No dedicated keymaps; use the shared LSP keys. Format on save runs `rustfmt`
+Active in Rust buffers under the `<leader>r` prefix (e.g. `<leader>rt` runs
+the nearest `#[test]` via `cargo test`). Format on save runs `rustfmt`
 automatically via `rust-analyzer`.
 
 ## Debug (`nvim-dap`)

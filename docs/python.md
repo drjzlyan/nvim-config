@@ -25,7 +25,7 @@ These tools are assumed to be installed outside Neovim:
 | `basedpyright` / `basedpyright-langserver` | Type checking and LSP navigation | `uv tool install basedpyright` |
 | `ruff` | Linting, formatting, import organization, code actions | `uv tool install ruff` |
 | `pytest` | Running tests | `uv add --dev pytest` |
-| `debugpy` | Reserved for future debugging work | `uv add --dev debugpy` |
+| `debugpy` | DAP debug adapter (Phase 7) | `uv tool install debugpy` |
 
 Mason is not used.
 
@@ -109,8 +109,18 @@ All Python keymaps are under `<leader>p` and only active in Python buffers.
 | `<leader>pf` | n / v | Format with Ruff |
 | `<leader>pv` | n | Show detected Python interpreter |
 
-There is also a set of buffer-local user commands (`:PythonRunFile`,
-`:PythonTestFunction`, etc.) that the keymaps call.
+Buffer-local user commands (called by the keymaps above):
+
+| Command | Action |
+|---------|--------|
+| `:PythonRunFile` | Run current file |
+| `:PythonRunModule` | Run as a module (`-m`) |
+| `:PythonRunSelection` | Run selected code |
+| `:PythonTestFile` | pytest current file |
+| `:PythonTestFunction` | pytest function under cursor |
+| `:PythonTestProject` | pytest full project |
+| `:PythonOrganizeImports` | Organize imports via Ruff |
+| `:PythonFormat` | Format with Ruff |
 
 ## Testing
 

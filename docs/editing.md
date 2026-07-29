@@ -30,15 +30,15 @@ Default mappings:
 
 Supports quotes, parentheses, brackets, braces, and HTML-style tags.
 
-## Comments (`Comment.nvim`)
+## Comments (built-in)
+
+Neovim 0.10+ provides native `gc` operators — no plugin required.
 
 | Key | Mode | Action |
 |-----|------|--------|
 | `gcc` | normal | Toggle current line |
 | `gc` | normal / visual | Toggle motion or selection |
 | `gbc` | normal | Toggle block comment |
-
-`Comment.nvim` is configured in `lua/features/editing.lua`.
 
 ## TODO comments (`todo-comments.nvim`)
 

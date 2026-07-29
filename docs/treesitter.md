@@ -17,8 +17,19 @@ Only the parsers needed for configuration and general editing are installed:
 - `dockerfile`
 - `gitignore`
 
-Language-specific parsers (Java, Python, TypeScript, etc.) will be added in
-Phase 3.
+Language-specific parsers are loaded dynamically at startup from
+`lua/features/treesitter.lua` based on the languages selected in
+`~/.local/share/nvim/languages.local`. Selecting Python, Java, TypeScript, Go,
+C/C++, or Rust automatically adds the corresponding parsers (e.g. `python`,
+`java`, `typescript`, `tsx`, `javascript`, `go`, `gomod`, `gosum`, `cpp`, `c`,
+`rust`).
+
+## Treesitter context
+
+`nvim-treesitter-context` pins a sticky header at the top of the buffer showing
+the function, class, or block the cursor is currently inside. Up to 3 context
+lines are shown (`max_lines = 3`). This has no keymaps — it updates
+automatically as you scroll.
 
 ## Incremental selection
 

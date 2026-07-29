@@ -27,10 +27,11 @@ If you are using the companion `dotfiles` repository:
 ```bash
 cd dotfiles
 ./install.sh
-./link.sh
 ```
 
-This installs the required tools and fonts.
+`install.sh` calls `link.sh` internally, so running it is the only step needed.
+After pulling updates you can re-run `./link.sh` on its own to refresh symlinks
+without repeating the full bootstrap.
 
 ## Language servers
 

@@ -41,14 +41,33 @@ Each file returns a list of lazy.nvim specs that implement one capability:
 
 ### `lua/languages`
 
-Reserved for language-specific configuration and LSP servers.
+Language-specific configuration and LSP servers. `init.lua` reads
+`~/.local/share/nvim/languages.local` and conditionally loads the matching
+module. Each module returns `{}` and registers its own `FileType` and
+`BufWritePre` autocommands.
+
+Entry points:
 
 | File | Language | Servers / Tools |
 |------|----------|-----------------|
+| `init.lua` | — | Language loader; exposes `M.available`, `M.selected()` |
 | `python.lua` | Python | `basedpyright`, `ruff`, `uv`, `pytest` |
-| `python-debug.lua` | Python debugging | `debugpy` |
 | `java.lua` | Java | `jdtls`, `google-java-format`, `maven`, `gradle` |
-| `java-debug.lua` | Java debugging | `java-debug`, `java-test` |
+| `typescript.lua` | TypeScript / JS | `ts_ls`, `prettier` |
+| `go.lua` | Go | `gopls`, `goimports` |
+| `cpp.lua` | C / C++ | `clangd` |
+| `rust.lua` | Rust | `rust-analyzer`, `rustfmt` |
+
+Helpers in `lib/` (shared by the entry points above):
+
+| File | Purpose |
+|------|---------|
+| `lib/python-debug.lua` | Delve DAP adapter configuration for Python |
+| `lib/java-commands.lua` | Buffer-local Ex commands and keymaps for Java |
+| `lib/java-debug.lua` | Java DAP adapter and `java-debug`/`java-test` bundle discovery |
+| `lib/java-project.lua` | Maven and Gradle project command helpers |
+| `lib/java-testing.lua` | Java test runner adapter (JUnit 4/5, TestNG) |
+| `lib/go-debug.lua` | Delve DAP adapter configuration for Go |
 
 ### `lua/util`
 

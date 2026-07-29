@@ -1,6 +1,6 @@
 # Debugging
 
-Phase 7 adds a production-quality debugging experience for Python and Java.
+Phase 7 adds a production-quality debugging experience for Python, Java, and Go.
 
 ## Plugins
 
@@ -16,11 +16,13 @@ Install these outside Neovim:
 
 ```bash
 # Python
-pip install debugpy
+uv tool install debugpy
 
-# Java
-# Install java-debug and java-test via your preferred method (e.g. Homebrew or
-# by downloading the VS Code Java extension JARs).
+# Java — install java-debug and java-test bundles (e.g. via Homebrew or the
+# VS Code Java extension JARs placed in a directory searched by java-debug.lua)
+
+# Go
+go install github.com/go-delve/delve/cmd/dlv@latest
 ```
 
 ## Keymaps
@@ -92,6 +94,27 @@ and the session starts.
 
 For **attach mode**, a static configuration is provided to connect to a JVM
 listening on `127.0.0.1:5005`.
+
+## Go debugging
+
+Go debugging uses the Delve DAP adapter configured in
+`lua/languages/lib/go-debug.lua`. The adapter is registered via a `FileType go`
+autocommand — it loads automatically the first time you open a `.go` file, with
+no extra configuration required.
+
+Available launch configurations when you press `<leader>dc` in a Go buffer:
+
+- **Debug current file** — runs `dlv debug` on the file in the active buffer.
+- **Debug package** — runs `dlv debug` on the current package.
+- **Debug test** — runs `dlv test` on the current package.
+- **Attach to process** — prompts for a PID to attach to a running Go process.
+
+Virtual environment detection is not needed for Go; `dlv` is resolved from
+`$PATH`. Install it with:
+
+```bash
+go install github.com/go-delve/delve/cmd/dlv@latest
+```
 
 ## REPL
 

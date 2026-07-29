@@ -15,6 +15,7 @@ Leader: `<Space>`
 | `<leader>=` | n | Equalize splits |
 | `<C-h/j/k/l>` | n | Navigate windows |
 | `<A-j/k>` | n/v | Move line(s) |
+| `<` / `>` | v | Indent left / right (selection stays active) |
 
 ## Diagnostics (`trouble.nvim`)
 
@@ -32,6 +33,14 @@ Leader: `<Space>`
 |-----|--------|
 | `<leader>E` | Open oil at current file's directory |
 | `<leader>O` | Open oil at working directory |
+
+Inside an oil buffer:
+
+| Key | Action |
+|-----|--------|
+| `q` | Close oil |
+| `<C-s>` | Open file in horizontal split |
+| `<C-v>` | Open file in vertical split |
 
 ## Files (`fzf-lua`)
 
@@ -299,4 +308,6 @@ These commands are not bound to keys by default.
 | `:DevReload` | Reload configuration modules |
 | `:DevUpdate` | Update plugins and external tooling |
 | `:DevProfile` | Profile Neovim startup |
-| `:DevCleanCache` | Clear Treesitter, JDTLS, swap, session, or Lazy caches |
+| `:DevCleanCache [target]` | Clear one or more caches — `treesitter`, `jdtls`, `swap`, `sessions`, `lazy`, or `all` |
+
+Examples: `:DevCleanCache jdtls`, `:DevCleanCache treesitter sessions`, `:DevCleanCache all`.

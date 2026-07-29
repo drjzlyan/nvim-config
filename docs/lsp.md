@@ -97,11 +97,25 @@ Diagnostics are configured globally in `lua/features/lsp.lua`:
 - Floating windows use rounded borders and sort by severity.
 - Signs show a single letter per severity.
 
+## Completion behavior
+
+`blink.cmp` is configured with several automatic UX features:
+
+- **Ghost text**: the top completion candidate is shown inline in the buffer as
+  you type (like IDE inline suggestions). It uses the buffer's comment style so
+  it is visually distinct.
+- **Auto-signature**: a signature help popup appears automatically after typing
+  an opening parenthesis or comma. No manual `<C-k>` needed while writing a
+  call expression.
+- **Documentation popup**: hovering over a completion item shows documentation
+  after 300 ms.
+
 ## LSP UI
 
 - Hover and signature help use rounded borders via the keymap callbacks.
 - Text changes are debounced by 150 ms per server.
-- No automatic popups besides completion.
+- Completion and signature help appear automatically; diagnostics do not pop up
+  automatically (use `<leader>ee` for the Trouble list or `K` for hover).
 
 ## Not included
 

@@ -22,14 +22,16 @@ Editing improvements: syntax, text objects, pairs, surround, and comments.
 |--------|---------|-------|
 | `nvim-treesitter/nvim-treesitter` | Syntax / indentation / incremental selection | `BufReadPost`/`BufNewFile` |
 | `nvim-treesitter/nvim-treesitter-textobjects` | Function/class/block/parameter text objects | Bundled with treesitter |
+| `nvim-treesitter/nvim-treesitter-context` | Sticky context header (current function/class) | Bundled with treesitter |
 | `echasnovski/mini.pairs` | Auto-close pairs | `VeryLazy` |
 | `echasnovski/mini.surround` | Add/change/delete surrounding pairs | `VeryLazy` |
-| `numToStr/Comment.nvim` | `gc`/`gcc` commenting | `VeryLazy` |
 | `folke/todo-comments.nvim` | Highlight and search TODO/FIXME/etc. | `VeryLazy` |
+
+Commenting uses Neovim 0.10's native `gc`/`gcc` operators — no plugin required.
 
 ## Phase 3
 
-Language-aware editing: LSP, completion, and snippets.
+Language-aware editing: LSP, completion, diagnostics, and snippets.
 
 | Plugin | Purpose | Lazy? |
 |--------|---------|-------|
@@ -37,6 +39,8 @@ Language-aware editing: LSP, completion, and snippets.
 | `saghen/blink.cmp` | Completion engine | `InsertEnter` / `CmdlineEnter` |
 | `L3MON4D3/LuaSnip` | Snippet expansion engine | Bundled with completion |
 | `rafamadriz/friendly-snippets` | Common snippet definitions | Bundled with completion |
+| `folke/trouble.nvim` | Structured diagnostic list and LSP result viewer | `cmd` (`Trouble`, `TroubleToggle`) |
+| `stevearc/conform.nvim` | Java code formatter bridge for `google-java-format` | `ft = "java"` |
 
 ## Phase 6
 
@@ -61,7 +65,9 @@ External tools:
   experience with fewer concepts.
 - **Minimal statusline**: `lualine` shows only the most useful information.
 - **Snacks dashboard disabled**: we prefer a clean startup screen. Only
-  `notifier`, `input`, and `picker` are enabled.
+  `notifier`, `input`, `picker`, and `bigfile` are enabled.
+- **No `Comment.nvim`**: Neovim 0.10+ provides native `gc`/`gcc` operators;
+  no plugin is needed.
 - **No Mason**: language servers are installed externally with Homebrew to keep
   Neovim configuration separate from toolchain management.
 - **`blink.cmp`**: replaces `nvim-cmp` with a single, fast completion plugin
@@ -72,7 +78,7 @@ External tools:
 
 ## Phase 7
 
-Debugging for Python and Java.
+Debugging for Python, Java, and Go.
 
 | Plugin | Purpose | Lazy? |
 |--------|---------|-------|
@@ -84,9 +90,18 @@ Debugging for Python and Java.
 
 External tools:
 
-- `debugpy`
-- `java-debug`
-- `java-test`
+- `debugpy` (Python)
+- `java-debug` + `java-test` (Java)
+- `delve` (Go — `dlv` binary, installed via `go install`)
+
+## Active snacks modules
+
+Only the following `snacks.nvim` modules are enabled:
+
+- `notifier` — replaces `vim.notify` with a floating notification queue
+- `input` — styled `vim.ui.input` for rename and other prompts
+- `picker` — picker backend used for fzf-lua fallback
+- `bigfile` — automatically disables swap, undo, and syntax for files larger than 1 MB
 
 ## Disabled snacks modules
 

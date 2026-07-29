@@ -98,6 +98,7 @@ Other useful bindings:
 | Key | Action |
 |-----|--------|
 | `Ctrl-a r` | Reload tmux config |
+| `Ctrl-a S` | Toggle synchronize-panes (sends all keystrokes to every pane) |
 | `Ctrl-a :` | Open tmux command prompt |
 
 ---
@@ -321,9 +322,10 @@ configuration — that lives in `nvim-config`.
 ```bash
 git clone git@github.com:drjzlyan/devenv-dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./install.sh     # installs Homebrew packages + casks from the Brewfile (idempotent)
-./link.sh        # symlinks .zshrc, .tmux.conf, .gitconfig, starship.toml, … into $HOME
+./install.sh     # installs Homebrew packages + casks, links dotfiles, runs language selector
 ```
+
+`install.sh` calls `link.sh` internally — no need to run it separately on a fresh install. To refresh symlinks after pulling updates without re-bootstrapping, run `./link.sh` on its own.
 
 What you get (from the Brewfile):
 
@@ -562,6 +564,11 @@ If only one agent is found, it is used automatically. If none are found, a
 shell opens in the agent pane. Pressing Ctrl-C at the menu opens a shell (no
 agent) — this is the default/reset state.
 
+**Agent preference persistence**: the chosen agent is saved per project directory
+to `~/.local/share/nvim/ide-preferences.local`. Re-opening the same project with
+`dev` reuses the saved agent without prompting. `dev -a <agent>` both sets the
+session agent and updates the saved preference.
+
 **In-session agent management** (tmux keybindings, available while you work):
 
 | Key | Action |
@@ -569,6 +576,9 @@ agent) — this is the default/reset state.
 | `Ctrl-a A` | Interactive agent switcher (type the agent name) |
 | `Ctrl-a N` | Cycle to the next detected agent |
 | `Ctrl-a D` | Reset pane layout to default (preserves nvim) |
+| `Ctrl-a Q` | Kill the IDE session (with confirmation) |
+| `Ctrl-a P` | Create a new project (prompts for `language:name`) |
+| `Ctrl-a S` | Toggle synchronize-panes mode (sends keystrokes to all panes) |
 
 `Ctrl-a D` is the escape hatch: if you accidentally closed a pane, resized
 panes badly, or just want to start fresh, it kills all panes except nvim and
@@ -1109,7 +1119,27 @@ func TestDivideByZero(t *testing.T) {
 the same shared LSP keys. Staticcheck and nilness analyses are enabled
 automatically.
 
-### 3c.6 tmux workflow
+### 3c.6 Debug with DAP (Delve)
+
+Go debugging uses the Delve DAP adapter. It loads automatically via a
+`FileType go` autocommand — no extra setup once `dlv` is on `$PATH`.
+
+1. Put the cursor on `return a + b` inside `Add`, press `<leader>db` to set a
+   breakpoint.
+2. Press `<leader>dc` — a picker shows four configurations:
+   - **Debug current file**
+   - **Debug package**
+   - **Debug test** — runs `dlv test` on the current package.
+   - **Attach to process** — prompts for a PID.
+   Pick **Debug current file** for now.
+3. The DAP UI opens: scopes, breakpoints, call stack, REPL, console.
+   `nvim-dap-virtual-text` shows variable values inline.
+4. Step with `<leader>do` (over), `<leader>di` (into), `<leader>dO` (out).
+5. Stop with `<leader>dt`; clear breakpoints with `<leader>dx`.
+
+The same `<leader>d*` keymaps work identically in Python, Java, and Go.
+
+### 3c.7 tmux workflow
 
 ```bash
 dev calc-go
@@ -1118,7 +1148,7 @@ dev calc-go
 Run `go test ./...` in the build/test pane (`Ctrl-a j`), review failures, fix
 in nvim (`Ctrl-a h`), re-run. Commit via `Ctrl-a g` (lazygit tmux window).
 
-You have now built and tested Go.
+You have now built, tested, and debugged Go.
 
 ---
 
@@ -1442,7 +1472,7 @@ between toggles.
 | Format the current buffer | `<leader>lf` |
 | Run the current Python file | `<leader>pr` |
 | Run the Python test under the cursor | `<leader>ptf` |
-| Debug (Python or Java) | `<leader>db` (breakpoint) → `<leader>dc` (start) |
+| Debug (Python, Java, or Go) | `<leader>db` (breakpoint) → `<leader>dc` (start) |
 | Compile a Java project | `<leader>jc` |
 | Run the Java test under the cursor | `<leader>jt` |
 | Restart jdtls | `<leader>Ww` |

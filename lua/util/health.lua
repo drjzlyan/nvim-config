@@ -402,7 +402,11 @@ function M.check_all()
   if langs.typescript then
     vim.list_extend(results, {
       check_tool("node", { "node", "--version" }, "install via mise: mise install node"),
-      check_tool("typescript-language-server", { "typescript-language-server", "--version" }, "npm install -g typescript-language-server typescript"),
+      check_tool(
+        "typescript-language-server",
+        { "typescript-language-server", "--version" },
+        "npm install -g typescript-language-server typescript"
+      ),
       check_tool("prettier", { "prettier", "--version" }, "npm install -g prettier"),
     })
   end

@@ -7,7 +7,10 @@ function M.setup()
   end
 
   if vim.fn.executable("dlv") == 0 then
-    vim.notify("dlv (Delve) not found. Install with: go install github.com/go-delve/delve/cmd/dlv@latest", vim.log.levels.WARN)
+    vim.notify(
+      "dlv (Delve) not found. Install with: go install github.com/go-delve/delve/cmd/dlv@latest",
+      vim.log.levels.WARN
+    )
     return
   end
 
